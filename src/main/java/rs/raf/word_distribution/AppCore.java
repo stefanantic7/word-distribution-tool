@@ -6,9 +6,10 @@ import rs.raf.word_distribution.file_input.Disk;
 import rs.raf.word_distribution.file_input.FileInput;
 import rs.raf.word_distribution.file_input.ReadingFileWorker;
 
-import java.io.File;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,8 +19,8 @@ public class AppCore {
         ExecutorService inputThreadPool = Executors.newCachedThreadPool();
         ExecutorService cruncherThreadPool = Executors.newCachedThreadPool();
 
-        Disk disk1 = new Disk("/Users/antic/Dev/faks/word-distribution-tool/data/disk1/");
-        Disk disk2 = new Disk("/Users/antic/Dev/faks/word-distribution-tool/data/disk2/");
+        Disk disk1 = new Disk(Config.DISKS.get(0));
+        Disk disk2 = new Disk(Config.DISKS.get(1));
         FileInput input1 = new FileInput(disk1, inputThreadPool);
         FileInput input2 = new FileInput(disk2, inputThreadPool);
 
@@ -28,7 +29,7 @@ public class AppCore {
         input2.linkCruncher(cruncher);
 
         Thread cruncherThread = new Thread(cruncher);
-//        cruncherThread.start();
+        cruncherThread.start();
 
         File folderA = new File(disk1.getDiskPath() + "A");
         File folderB = new File(disk1.getDiskPath() + "B");
@@ -48,5 +49,6 @@ public class AppCore {
         Thread readingFileWorkerDisk2 = new Thread(new ReadingFileWorker(input2));
         readingFileWorkerDisk1.start();
         readingFileWorkerDisk2.start();
+
     }
 }

@@ -67,7 +67,7 @@ public abstract class Input implements Runnable {
             if (this.running.get()) {
                 this.scan();
 
-                this.sleep(5000); // Parameter from properties file
+                this.sleep(Config.FILE_INPUT_SLEEP_TIME);
             } else {
                 this.stop();
             }
