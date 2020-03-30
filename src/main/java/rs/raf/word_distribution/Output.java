@@ -9,13 +9,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Output {
-    protected BlockingQueue<Future<CruncherDataFrame<Map<BagOfWords,Integer>>>> cruncherDataFrameFutureBlockingQueue;
+    protected BlockingQueue<CruncherDataFrame<Map<BagOfWords,Integer>>> cruncherDataFrameBlockingQueue;
 
     public Output() {
-        this.cruncherDataFrameFutureBlockingQueue = new LinkedBlockingQueue<>();
+        this.cruncherDataFrameBlockingQueue = new LinkedBlockingQueue<>();
     }
 
-    public void putCruncherDataFrameFuture(Future<CruncherDataFrame<Map<BagOfWords, Integer>>> cruncherDataFrameFuture) {
-        this.cruncherDataFrameFutureBlockingQueue.add(cruncherDataFrameFuture);
+    public void putCruncherDataFrame(CruncherDataFrame<Map<BagOfWords, Integer>> cruncherDataFrame) {
+        this.cruncherDataFrameBlockingQueue.add(cruncherDataFrame);
     }
 }

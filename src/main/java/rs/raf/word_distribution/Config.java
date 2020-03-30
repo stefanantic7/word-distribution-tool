@@ -24,6 +24,6 @@ public class Config {
 
     public static final long FILE_INPUT_SLEEP_TIME = Long.parseLong(prop.getProperty("file_input_sleep_time"));
     public static final List<String> DISKS = Arrays.stream(prop.getProperty("disks").split(";")).collect(Collectors.toUnmodifiableList());
-    public static final long COUNTER_DATA_LIMIT = Long.parseLong(prop.getProperty("counter_data_limit"));
+    public static final int COUNTER_DATA_LIMIT = Integer.parseInt(prop.getProperty("counter_data_limit"));
     public static final long SORT_PROGRESS_LIMIT = Long.parseLong(prop.getProperty("sort_progress_limit"));
 }

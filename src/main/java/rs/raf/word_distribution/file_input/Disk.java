@@ -5,9 +5,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Disk {
-    private String diskPath;
+    private final String diskPath;
 
-    private BlockingQueue<File> readingQueue;
+    private final BlockingQueue<File> readingQueue;
 
     public Disk(String diskPath) {
         this.diskPath = diskPath;

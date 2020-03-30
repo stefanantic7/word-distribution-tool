@@ -29,6 +29,14 @@ public abstract class Cruncher implements Runnable {
         this.outputs.remove(output);
     }
 
+    public void linkOutputs(Output output) {
+        this.outputs.add(output);
+    }
+
+    public List<Output> getOutputs() {
+        return outputs;
+    }
+
     public int getArity() {
         return arity;
     }
@@ -42,8 +50,8 @@ public abstract class Cruncher implements Runnable {
         while (true) {
             try {
                 InputDataFrame inputDataFrame = inputDataFrameBlockingQueue.take();
+                System.out.println("Cruncher will handle: " + inputDataFrame.getSource());
                 this.handle(inputDataFrame);
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

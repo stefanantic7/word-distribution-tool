@@ -8,28 +8,26 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class ReadingFileWorker implements Runnable {
+public class ReadingDiskWorker implements Runnable {
 
     private FileInput fileInput;
 
-    public ReadingFileWorker(FileInput fileInput) {
+    public ReadingDiskWorker(FileInput fileInput) {
         this.fileInput = fileInput;
     }
 
     @Override
     public void run() {
         while (true) {
-            if(this.fileInput.isRunning()) {
-                try {
-                    File file = this.fileInput.getDisk().getReadingQueue().take();
+            try {
+                File file = this.fileInput.getDisk().getReadingQueue().take();
 
-                    Future<InputDataFrame> inputDataFrameFuture =
-                            this.fileInput.getInputThreadPool().submit(new FileReader(file));
+                Future<InputDataFrame> inputDataFrameFuture =
+                        this.fileInput.getInputThreadPool().submit(new FileReader(file));
 
-                    this.passToCruncher(inputDataFrameFuture.get());
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
+                this.passToCruncher(inputDataFrameFuture.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         }
     }

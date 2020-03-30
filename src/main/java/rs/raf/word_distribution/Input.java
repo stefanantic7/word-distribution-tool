@@ -25,10 +25,6 @@ public abstract class Input implements Runnable {
 
     public abstract void scan();
 
-    public boolean isRunning() {
-        return this.running.get();
-    }
-
     public synchronized void pause() {
         if(this.running.compareAndSet(true, false)) {
             this.notify();
