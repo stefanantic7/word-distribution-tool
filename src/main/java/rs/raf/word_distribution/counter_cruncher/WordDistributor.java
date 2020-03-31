@@ -29,8 +29,7 @@ public class WordDistributor implements Runnable {
     public void run() {
         Map<BagOfWords, Integer> bagsMap = new HashMap<>();
         String dataFrameName = inputDataFrame.getSource() + "-arity"+this.counterCruncher.getArity();
-        CruncherDataFrame<Map<BagOfWords, Integer>> cruncherDataFrame
-                = new CruncherDataFrame<>(dataFrameName, bagsMap);
+        CruncherDataFrame cruncherDataFrame = new CruncherDataFrame(dataFrameName, bagsMap);
 
         // Broadcast started event
         this.broadcastCruncherDataFrame(cruncherDataFrame);
@@ -49,11 +48,10 @@ public class WordDistributor implements Runnable {
         this.broadcastCruncherDataFrame(cruncherDataFrame);
     }
 
-    private void broadcastCruncherDataFrame(CruncherDataFrame<Map<BagOfWords, Integer>> cruncherDataFrame) {
-        List<Output> outputs = this.counterCruncher.getOutputs();
-        for (Output output : outputs) {
+    private void broadcastCruncherDataFrame(CruncherDataFrame cruncherDataFrame) {
+        for (Output output : this.counterCruncher.getOutputs()) {
             System.out.println("Broadcasting to outputs: "+cruncherDataFrame.getName());
-            System.out.println("Size: "+cruncherDataFrame.getData().keySet().size());
+
             output.putCruncherDataFrame(cruncherDataFrame);
         }
     }

@@ -3,18 +3,18 @@ package rs.raf.word_distribution;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class CruncherDataFrame<T> {
+public class CruncherDataFrame {
     private final String name;
-    private final T data;
+    private final Object data;
     private final boolean completed;
 
-    public CruncherDataFrame(String name, T data) {
+    public CruncherDataFrame(String name, Object data) {
         this.name = name;
         this.data = data;
         this.completed = false;
     }
 
-    private CruncherDataFrame(String name, T data, boolean completed) {
+    private CruncherDataFrame(String name, Object data, boolean completed) {
         this.name = name;
         this.data = data;
         this.completed = completed;
@@ -24,7 +24,7 @@ public class CruncherDataFrame<T> {
         return name;
     }
 
-    public T getData() {
+    public Object getData() {
         return data;
     }
 
@@ -32,15 +32,15 @@ public class CruncherDataFrame<T> {
         return completed;
     }
 
-    public CruncherDataFrame<T> complete(T data) {
-        return new CruncherDataFrame<>(this.getName(), data, true);
+    public CruncherDataFrame complete(Object data) {
+        return new CruncherDataFrame(this.getName(), data, true);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CruncherDataFrame<?> that = (CruncherDataFrame<?>) o;
+        CruncherDataFrame that = (CruncherDataFrame) o;
         return completed == that.completed &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(data, that.data);

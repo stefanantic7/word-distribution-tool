@@ -1,5 +1,6 @@
 package rs.raf.word_distribution;
 
+import javafx.stage.Stage;
 import rs.raf.word_distribution.cache_output.CacheOutput;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
 import rs.raf.word_distribution.counter_cruncher.CounterCruncher;
@@ -19,12 +20,11 @@ import java.util.stream.Collectors;
 
 public class AppCore {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         ExecutorService inputThreadPool = Executors.newCachedThreadPool();
-//        ExecutorService inputThreadPool = Executors.newFixedThreadPool(2);
         ForkJoinPool cruncherThreadPool = new ForkJoinPool();
-//        ExecutorService cruncherThreadPool = Executors.newCachedThreadPool();
-//        ExecutorService cruncherThreadPool = Executors.newFixedThreadPool(1);
+        ExecutorService outputThreadPool = Executors.newCachedThreadPool();
+
 
         Disk disk1 = new Disk(Config.DISKS.get(0));
         Disk disk2 = new Disk(Config.DISKS.get(1));
@@ -32,23 +32,31 @@ public class AppCore {
         FileInput input2 = new FileInput(disk2, inputThreadPool);
 
         Cruncher cruncher = new CounterCruncher(1, cruncherThreadPool);
+        Cruncher cruncher2 = new CounterCruncher(2, cruncherThreadPool);
         input1.linkCruncher(cruncher);
+        input1.linkCruncher(cruncher2);
         input2.linkCruncher(cruncher);
 
         Thread cruncherThread = new Thread(cruncher);
+        Thread cruncherThread2 = new Thread(cruncher2);
         cruncherThread.start();
+        cruncherThread2.start();
 
-        Output output = new CacheOutput();
+        Output output = new CacheOutput(outputThreadPool);
         cruncher.linkOutputs(output);
+        cruncher2.linkOutputs(output);
+
+        Thread outputThread = new Thread(output);
+        outputThread.start();
 
         File folderA = new File(disk1.getDiskPath() + "A");
-        File folderB = new File(disk1.getDiskPath() + "B");
-        File folderC = new File(disk2.getDiskPath() + "C");
-        File folderD = new File(disk2.getDiskPath() + "D");
+//        File folderB = new File(disk1.getDiskPath() + "B");
+//        File folderC = new File(disk2.getDiskPath() + "C");
+//        File folderD = new File(disk2.getDiskPath() + "D");
         input1.addFolder(folderA);
-        input1.addFolder(folderB);
-        input2.addFolder(folderC);
-        input2.addFolder(folderD);
+//        input1.addFolder(folderB);
+//        input2.addFolder(folderC);
+//        input2.addFolder(folderD);
 
         Thread input1Thread = new Thread(input1);
         Thread input2Thread = new Thread(input2);

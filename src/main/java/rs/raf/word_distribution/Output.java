@@ -8,14 +8,33 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class Output {
-    protected BlockingQueue<CruncherDataFrame<Map<BagOfWords,Integer>>> cruncherDataFrameBlockingQueue;
+public abstract class Output implements Runnable {
+    protected BlockingQueue<CruncherDataFrame> cruncherDataFrameBlockingQueue;
 
     public Output() {
         this.cruncherDataFrameBlockingQueue = new LinkedBlockingQueue<>();
     }
 
-    public void putCruncherDataFrame(CruncherDataFrame<Map<BagOfWords, Integer>> cruncherDataFrame) {
+    public abstract void process(CruncherDataFrame cruncherDataFrame);
+
+    public abstract void store(String name, Object data);
+
+    public abstract Object get(String name);
+
+    public void putCruncherDataFrame(CruncherDataFrame cruncherDataFrame) {
         this.cruncherDataFrameBlockingQueue.add(cruncherDataFrame);
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                CruncherDataFrame cruncherDataFrame = this.cruncherDataFrameBlockingQueue.take();
+
+                this.process(cruncherDataFrame);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
