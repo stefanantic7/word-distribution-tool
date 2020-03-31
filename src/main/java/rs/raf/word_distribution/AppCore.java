@@ -22,20 +22,20 @@ public class AppCore {
 
     public static void main(String[] args) {
         ExecutorService inputThreadPool = Executors.newCachedThreadPool();
-        ForkJoinPool cruncherThreadPool = new ForkJoinPool();
+        ForkJoinPool cruncherThreadPool = ForkJoinPool.commonPool();
         ExecutorService outputThreadPool = Executors.newCachedThreadPool();
 
 
         Disk disk1 = new Disk(Config.DISKS.get(0));
-        Disk disk2 = new Disk(Config.DISKS.get(1));
+//        Disk disk2 = new Disk(Config.DISKS.get(1));
         FileInput input1 = new FileInput(disk1, inputThreadPool);
-        FileInput input2 = new FileInput(disk2, inputThreadPool);
+//        FileInput input2 = new FileInput(disk2, inputThreadPool);
 
         Cruncher cruncher = new CounterCruncher(1, cruncherThreadPool);
         Cruncher cruncher2 = new CounterCruncher(2, cruncherThreadPool);
         input1.linkCruncher(cruncher);
         input1.linkCruncher(cruncher2);
-        input2.linkCruncher(cruncher);
+//        input2.linkCruncher(cruncher);
 
         Thread cruncherThread = new Thread(cruncher);
         Thread cruncherThread2 = new Thread(cruncher2);
@@ -59,14 +59,33 @@ public class AppCore {
 //        input2.addFolder(folderD);
 
         Thread input1Thread = new Thread(input1);
-        Thread input2Thread = new Thread(input2);
+//        Thread input2Thread = new Thread(input2);
         input1Thread.start();
-        input2Thread.start();
+//        input2Thread.start();
 
         Thread readingFileWorkerDisk1 = new Thread(new ReadingDiskWorker(input1));
-        Thread readingFileWorkerDisk2 = new Thread(new ReadingDiskWorker(input2));
+//        Thread readingFileWorkerDisk2 = new Thread(new ReadingDiskWorker(input2));
         readingFileWorkerDisk1.start();
-        readingFileWorkerDisk2.start();
+//        readingFileWorkerDisk2.start();
 
+
+
+
+
+//        BagOfWords b1 = new BagOfWords(2);
+//        b1.add(new String("str1"));
+//        b1.add(new String("str2"));
+//
+//        BagOfWords b2 = new BagOfWords(2);
+//        b2.add(new String("str2"));
+//        b2.add(new String("str1"));
+//
+//        System.out.println(b1);
+//        System.out.println(b2);
+//
+//        System.out.println(b1.hashCode());
+//        System.out.println(b2.hashCode());
+//
+//        System.out.println(b1.equals(b2));
     }
 }

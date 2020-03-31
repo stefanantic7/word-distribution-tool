@@ -45,6 +45,9 @@ public class WordDistributor implements Runnable {
             e.printStackTrace();
         }
 
+        /// TODO: remove gc
+        System.gc();
+
         this.broadcastCruncherDataFrame(cruncherDataFrame);
     }
 

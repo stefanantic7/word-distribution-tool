@@ -27,6 +27,7 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
     @Override
     protected Map<BagOfWords, Integer> compute() {
+
         // TODO: use one concurrent map?
         Map<BagOfWords, Integer> bagsMap = new HashMap<>();
 
@@ -97,8 +98,6 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
             WordCounterTask computeJob = new WordCounterTask(index1, contentLength, content, arity, isEnd);
 
 
-
-
             forkJob.fork();
             Map<BagOfWords, Integer> rightResult = computeJob.compute();
             Map<BagOfWords, Integer> leftResult = forkJob.join();
@@ -122,7 +121,7 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
         //TODO: remove pointer(item) from list?
         for (int i = 0; i < (words.size() - (this.arity-1)); i++) {
-            BagOfWords bagOfWords = new BagOfWords();
+            BagOfWords bagOfWords = new BagOfWords(this.arity);
             for (int j = i; j < i + this.arity; j++) {
                 bagOfWords.add(words.get(j));
             }
