@@ -19,7 +19,9 @@ public abstract class Output implements Runnable {
 
     public abstract void store(String name, Object data);
 
-    public abstract Object get(String name);
+    public abstract Object take(String name);
+
+    public abstract Object poll(String name);
 
     public void putCruncherDataFrame(CruncherDataFrame cruncherDataFrame) {
         this.cruncherDataFrameBlockingQueue.add(cruncherDataFrame);

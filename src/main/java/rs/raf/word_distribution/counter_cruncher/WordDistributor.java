@@ -27,28 +27,24 @@ public class WordDistributor implements Runnable {
 
     @Override
     public void run() {
-        Map<BagOfWords, Integer> bagsMap = new HashMap<>();
         String dataFrameName = inputDataFrame.getSource() + "-arity"+this.counterCruncher.getArity();
-        CruncherDataFrame cruncherDataFrame = new CruncherDataFrame(dataFrameName, bagsMap);
-
-        // Broadcast started event
-        this.broadcastCruncherDataFrame(cruncherDataFrame);
 
         String content = this.inputDataFrame.getContent();
-        Future<Map<BagOfWords, Integer>> result
+        Future<Map<BagOfWords, Integer>> futureResult
                 = this.counterCruncher.getCruncherThreadPool().submit(new WordCounterTask(0, content.length(), content, this.counterCruncher.getArity(), false));
 
-        // Broadcast completed event
+        CruncherDataFrame cruncherDataFrame = new CruncherDataFrame(dataFrameName, futureResult);
+
+        this.broadcastCruncherDataFrame(cruncherDataFrame);
+
         try {
-            cruncherDataFrame = cruncherDataFrame.complete(result.get());
+            futureResult.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
         /// TODO: remove gc
         System.gc();
-
-        this.broadcastCruncherDataFrame(cruncherDataFrame);
     }
 
     private void broadcastCruncherDataFrame(CruncherDataFrame cruncherDataFrame) {

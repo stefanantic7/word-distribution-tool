@@ -9,13 +9,8 @@ import rs.raf.word_distribution.file_input.FileInput;
 import rs.raf.word_distribution.file_input.ReadingDiskWorker;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class AppCore {
@@ -25,13 +20,12 @@ public class AppCore {
         ForkJoinPool cruncherThreadPool = ForkJoinPool.commonPool();
         ExecutorService outputThreadPool = Executors.newCachedThreadPool();
 
-
         Disk disk1 = new Disk(Config.DISKS.get(0));
 //        Disk disk2 = new Disk(Config.DISKS.get(1));
         FileInput input1 = new FileInput(disk1, inputThreadPool);
 //        FileInput input2 = new FileInput(disk2, inputThreadPool);
 
-        Cruncher cruncher = new CounterCruncher(3, cruncherThreadPool);
+        Cruncher cruncher = new CounterCruncher(1, cruncherThreadPool);
 //        Cruncher cruncher2 = new CounterCruncher(2, cruncherThreadPool);
         input1.linkCruncher(cruncher);
 //        input1.linkCruncher(cruncher2);
@@ -72,20 +66,55 @@ public class AppCore {
 
 
 
-//        BagOfWords b1 = new BagOfWords(2);
-//        b1.add(new String("str1"));
-//        b1.add(new String("str2"));
+        //// Aggregating test
+//        CacheOutput cacheOutput = new CacheOutput(Executors.newCachedThreadPool());
 //
-//        BagOfWords b2 = new BagOfWords(2);
-//        b2.add(new String("str2"));
-//        b2.add(new String("str1"));
+//        ExecutorService pool = Executors.newCachedThreadPool();
 //
-//        System.out.println(b1);
-//        System.out.println(b2);
+//        cacheOutput.store("n0", pool.submit( () -> {
+//            Map<BagOfWords, Integer> map = new HashMap<>();
+//            BagOfWords b1 = new BagOfWords(2);
+//            b1.add("rec0");
+//            b1.add("rec0");
 //
-//        System.out.println(b1.hashCode());
-//        System.out.println(b2.hashCode());
+//            map.put(b1, 1);
+//            return map;
+//        }));
+//        cacheOutput.store("n1", pool.submit( () -> {
+//            Map<BagOfWords, Integer> map = new HashMap<>();
+//            BagOfWords b1 = new BagOfWords(2);
+//            b1.add("rec1");
+//            b1.add("rec2");
 //
-//        System.out.println(b1.equals(b2));
+//            map.put(b1, 2);
+//            return map;
+//        }));
+//
+//        cacheOutput.store("n2", pool.submit( () -> {
+//            Map<BagOfWords, Integer> map = new HashMap<>();
+//            BagOfWords b1 = new BagOfWords(2);
+//            b1.add("rec1");
+//            b1.add("rec2");
+//
+//            map.put(b1, 1);
+//            return map;
+//        }));
+//
+//        System.out.println(cacheOutput.take("n1"));
+//        System.out.println(cacheOutput.take("n2"));
+//
+//        ArrayList<String> existing = new ArrayList<>();
+//        existing.add("n1");
+//        existing.add("n2");
+//        existing.add("n0");
+//        cacheOutput.aggregate("n3", existing);
+//
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(cacheOutput.take("n3"));
+
     }
 }
