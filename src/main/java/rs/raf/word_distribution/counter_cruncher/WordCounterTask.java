@@ -59,7 +59,7 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
                     index2 = contentLength;
                     break;
                 }
-                if (content.charAt(index2) == ' ') {
+                if (Character.isWhitespace(content.charAt(index2))) {
                     break;
                 }
 
@@ -83,7 +83,7 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
                     if (wordsBefore == 0) {
                         break;
                     }
-                    if (this.content.charAt(index1) == ' ') {
+                    if (Character.isWhitespace(this.content.charAt(index1))) {
                         wordsBefore--;
                         if (wordsBefore == 0) {
                             index1++;

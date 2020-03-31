@@ -31,20 +31,20 @@ public class AppCore {
         FileInput input1 = new FileInput(disk1, inputThreadPool);
 //        FileInput input2 = new FileInput(disk2, inputThreadPool);
 
-        Cruncher cruncher = new CounterCruncher(1, cruncherThreadPool);
-        Cruncher cruncher2 = new CounterCruncher(2, cruncherThreadPool);
+        Cruncher cruncher = new CounterCruncher(3, cruncherThreadPool);
+//        Cruncher cruncher2 = new CounterCruncher(2, cruncherThreadPool);
         input1.linkCruncher(cruncher);
-        input1.linkCruncher(cruncher2);
+//        input1.linkCruncher(cruncher2);
 //        input2.linkCruncher(cruncher);
 
         Thread cruncherThread = new Thread(cruncher);
-        Thread cruncherThread2 = new Thread(cruncher2);
+//        Thread cruncherThread2 = new Thread(cruncher2);
         cruncherThread.start();
-        cruncherThread2.start();
+//        cruncherThread2.start();
 
         Output output = new CacheOutput(outputThreadPool);
         cruncher.linkOutputs(output);
-        cruncher2.linkOutputs(output);
+//        cruncher2.linkOutputs(output);
 
         Thread outputThread = new Thread(output);
         outputThread.start();
