@@ -2,10 +2,7 @@ package rs.raf.word_distribution.counter_cruncher;
 
 import rs.raf.word_distribution.Config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -117,9 +114,11 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
     private Map<BagOfWords, Integer> countWords(int index1, int index2) {
         HashMap<BagOfWords, Integer> bagsMap = new HashMap<>();
 
-        ArrayList<String> words = this.extractWords(index1, index2);
+        List<String> words = this.extractWords(index1, index2);
 
 //        System.out.println(words);
+
+        //TODO: remove pointer(item) from list
         for (int i = 0; i < (words.size() - (this.arity-1)); i++) {
             BagOfWords bagOfWords = new BagOfWords();
             for (int j = i; j < i + this.arity; j++) {
@@ -131,10 +130,10 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
         return bagsMap;
     }
 
-    private ArrayList<String> extractWords(int index1, int index2) {
+    private List<String> extractWords(int index1, int index2) {
         int startOfWord = index1;
 
-        ArrayList<String> words = new ArrayList<>();
+        List<String> words = new ArrayList<>();
         while (index1 < index2) {
             if (!Character.isWhitespace(this.content.charAt(index1))) {
                 index1++;

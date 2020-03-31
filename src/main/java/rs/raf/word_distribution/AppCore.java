@@ -31,7 +31,7 @@ public class AppCore {
         FileInput input1 = new FileInput(disk1, inputThreadPool);
         FileInput input2 = new FileInput(disk2, inputThreadPool);
 
-        Cruncher cruncher = new CounterCruncher(2, cruncherThreadPool);
+        Cruncher cruncher = new CounterCruncher(1, cruncherThreadPool);
         input1.linkCruncher(cruncher);
         input2.linkCruncher(cruncher);
 
@@ -46,9 +46,9 @@ public class AppCore {
         File folderC = new File(disk2.getDiskPath() + "C");
         File folderD = new File(disk2.getDiskPath() + "D");
         input1.addFolder(folderA);
-//        input1.addFolder(folderB);
-//        input2.addFolder(folderC);
-//        input2.addFolder(folderD);
+        input1.addFolder(folderB);
+        input2.addFolder(folderC);
+        input2.addFolder(folderD);
 
         Thread input1Thread = new Thread(input1);
         Thread input2Thread = new Thread(input2);

@@ -1,12 +1,9 @@
 package rs.raf.word_distribution.counter_cruncher;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class BagOfWords extends ArrayList<String> {
+public class BagOfWords extends LinkedList<String> {
 
     @Override
     public boolean add(String string) {
