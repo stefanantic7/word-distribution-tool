@@ -1,19 +1,12 @@
 package rs.raf.word_distribution.counter_cruncher;
 
-import rs.raf.word_distribution.Config;
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.InputDataFrame;
 import rs.raf.word_distribution.Output;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 public class WordDistributor implements Runnable {
 
@@ -27,28 +20,39 @@ public class WordDistributor implements Runnable {
 
     @Override
     public void run() {
-        String dataFrameName = inputDataFrame.getSource() + "-arity"+this.counterCruncher.getArity();
-
-        String content = this.inputDataFrame.getContent();
-        Future<Map<BagOfWords, Integer>> futureResult
-                = this.counterCruncher.getCruncherThreadPool().submit(new WordCounterTask(0, content.length(), content, this.counterCruncher.getArity(), false));
-
-        CruncherDataFrame cruncherDataFrame = new CruncherDataFrame(dataFrameName, futureResult);
+        CruncherDataFrame<BagOfWords, Integer> cruncherDataFrame = this.generateCruncherDataFrame();
 
         this.broadcastCruncherDataFrame(cruncherDataFrame);
 
+        // TODO: remove gc
         try {
-            futureResult.get();
+            cruncherDataFrame.getFuture().get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-
-        /// TODO: remove gc
         System.gc();
     }
 
-    private void broadcastCruncherDataFrame(CruncherDataFrame cruncherDataFrame) {
-        for (Output output : this.counterCruncher.getOutputs()) {
+    private CruncherDataFrame<BagOfWords, Integer> generateCruncherDataFrame() {
+        String dataFrameName = this.generateDataFrameName();
+
+        String content = this.inputDataFrame.getContent();
+
+        WordCounterTask wordCounterTask
+                = new WordCounterTask(0, content.length(), content, this.counterCruncher.getArity());
+
+        Future<Map<BagOfWords, Integer>> futureResult
+                = this.counterCruncher.getCruncherThreadPool().submit(wordCounterTask);
+
+        return new CruncherDataFrame<>(dataFrameName, futureResult);
+    }
+
+    private String generateDataFrameName() {
+        return inputDataFrame.getSource() + "-arity"+this.counterCruncher.getArity();
+    }
+
+    private void broadcastCruncherDataFrame(CruncherDataFrame<BagOfWords, Integer> cruncherDataFrame) {
+        for (Output<BagOfWords, Integer> output : this.counterCruncher.getOutputs()) {
             System.out.println("Broadcasting to outputs: "+cruncherDataFrame.getName());
 
             output.putCruncherDataFrame(cruncherDataFrame);

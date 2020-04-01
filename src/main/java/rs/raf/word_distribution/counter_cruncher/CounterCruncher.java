@@ -10,18 +10,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
-public class CounterCruncher extends Cruncher {
+public class CounterCruncher extends Cruncher<BagOfWords, Integer> {
+
+    protected int arity;
 
     private ForkJoinPool cruncherThreadPool;
 
     public CounterCruncher(int arity, ForkJoinPool cruncherThreadPool) {
-        super(arity);
+        super();
+        this.arity = arity;
         this.cruncherThreadPool = cruncherThreadPool;
     }
 
     @Override
     public void handle(InputDataFrame inputDataFrame) {
         cruncherThreadPool.submit(new WordDistributor(inputDataFrame, this));
+    }
+
+    public int getArity() {
+        return arity;
     }
 
     public ForkJoinPool getCruncherThreadPool() {

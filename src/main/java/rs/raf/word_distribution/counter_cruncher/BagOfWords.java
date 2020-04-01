@@ -17,7 +17,6 @@ public class BagOfWords {
 
     public boolean add(String word) {
         this.words[0] = word;
-
         Arrays.sort(this.words);
         return true;
     }
@@ -42,6 +41,7 @@ public class BagOfWords {
                 '}';
     }
 
+    // Use this method if BagOfWords extends LinkedList()
 //    @Override
 //    public boolean add(String string) {
 //        int index = Collections.binarySearch(this, string);

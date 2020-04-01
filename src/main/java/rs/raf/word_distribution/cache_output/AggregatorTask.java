@@ -1,6 +1,6 @@
 package rs.raf.word_distribution.cache_output;
 
-import rs.raf.word_distribution.CruncherDataFrame;
+import rs.raf.word_distribution.Output;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
 
 import java.util.HashMap;
@@ -8,19 +8,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.BiFunction;
 
-public class AggregatorTask implements Runnable {
+public class AggregatorTask<K, V> implements Runnable {
 
     private String newName;
 
     private List<String> existingResults;
 
-    private CacheOutput cacheOutput;
+    private CacheOutput<K, V> cacheOutput;
 
-    public AggregatorTask(String newName, List<String> existingResults, CacheOutput cacheOutput) {
+    private final BiFunction<V, V, V> aggregatingFunction;
+    public AggregatorTask(String newName,
+                          List<String> existingResults,
+                          CacheOutput<K, V> cacheOutput,
+                          BiFunction<V, V, V> aggregatingFunction) {
         this.newName = newName;
         this.existingResults = existingResults;
         this.cacheOutput = cacheOutput;
+        this.aggregatingFunction = aggregatingFunction;
     }
 
     @Override
@@ -29,23 +35,25 @@ public class AggregatorTask implements Runnable {
 
         // TODO: add *
 
-        Future<Map<BagOfWords, Integer>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
-            Map<BagOfWords, Integer> bagOfWordsIntegerMap = new HashMap<>();
+        Future<Map<K, V>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
+            Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
 
             for (String existingResult : existingResults) {
-                Map<BagOfWords, Integer> existingMap = (Map<BagOfWords, Integer>)this.cacheOutput.take(existingResult);
+                Map<K, V> existingMap = this.cacheOutput.take(existingResult);
 
                 // Merging
-                for (Map.Entry<BagOfWords, Integer> entry : existingMap.entrySet()) {
-                    bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                for (Map.Entry<K, V> entry : existingMap.entrySet()) {
+                    bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), this.aggregatingFunction);
                 }
             }
 
             return bagOfWordsIntegerMap;
         });
+
         this.cacheOutput.store(newName, futureResult);
+
         try {
-            this.cacheOutput.store(newName, futureResult.get());
+            futureResult.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class StoreOutputTask implements Runnable {
+public class StoreOutputTask<K, V> implements Runnable {
 
-    private CacheOutput cacheOutput;
+    private CacheOutput<K, V> cacheOutput;
 
-    private CruncherDataFrame cruncherDataFrame;
+    private CruncherDataFrame<K, V> cruncherDataFrame;
 
-    public StoreOutputTask(CacheOutput cacheOutput, CruncherDataFrame cruncherDataFrame) {
+    public StoreOutputTask(CacheOutput<K, V> cacheOutput, CruncherDataFrame<K, V> cruncherDataFrame) {
         this.cacheOutput = cacheOutput;
         this.cruncherDataFrame = cruncherDataFrame;
     }
@@ -21,11 +21,11 @@ public class StoreOutputTask implements Runnable {
     @Override
     public void run() {
         System.out.println("Storing: " + cruncherDataFrame.getName());
-        // TODO: Set * to name
+        // TODO: Add * to name
 
-        this.cacheOutput.store(cruncherDataFrame.getName(), cruncherDataFrame.getData());
+        this.cacheOutput.store(cruncherDataFrame.getName(), cruncherDataFrame.getFuture());
         try {
-            Map<BagOfWords, Integer> result = ((Future<Map<BagOfWords, Integer>>) cruncherDataFrame.getData()).get();
+            Map<K, V> result = cruncherDataFrame.getFuture().get();
 
             System.out.println("Stored: " + result.keySet().size());
         } catch (InterruptedException | ExecutionException e) {

@@ -16,7 +16,9 @@ public class Config {
         prop = new Properties();
         try {
             InputStream inputStream = Config.class.getClassLoader().getResourceAsStream("app.properties");
-            prop.load(inputStream);
+            if (inputStream != null) {
+                prop.load(inputStream);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

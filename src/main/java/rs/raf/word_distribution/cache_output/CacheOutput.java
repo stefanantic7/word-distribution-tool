@@ -10,10 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.function.BiFunction;
 
-public class CacheOutput extends Output {
+public class CacheOutput<K, V> extends Output<K, V> {
 
-    private Map<String, Future<Map<BagOfWords, Integer>>> storage;
+    private Map<String, Future<Map<K, V>>> storage;
 
     private ExecutorService outputThreadPool;
 
@@ -23,21 +24,21 @@ public class CacheOutput extends Output {
     }
 
     @Override
-    public void process(CruncherDataFrame cruncherDataFrame) {
-        outputThreadPool.submit(new StoreOutputTask(this, cruncherDataFrame));
+    public void process(CruncherDataFrame<K, V> cruncherDataFrame) {
+        outputThreadPool.submit(new StoreOutputTask<>(this, cruncherDataFrame));
     }
 
-    public void aggregate(String newName, List<String> existingResults) {
-        outputThreadPool.submit(new AggregatorTask(newName, existingResults, this));
-    }
-
-    @Override
-    public void store(String name, Object data) {
-        this.storage.put(name, (Future<Map<BagOfWords, Integer>>) data);
+    public void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction) {
+        outputThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction));
     }
 
     @Override
-    public Object take(String name) {
+    public void store(String name, Future<Map<K, V>> data) {
+        this.storage.put(name, data);
+    }
+
+    @Override
+    public Map<K, V> take(String name) {
         try {
             return this.storage.get(name).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -47,7 +48,7 @@ public class CacheOutput extends Output {
     }
 
     @Override
-    public Object poll(String name) {
+    public Map<K, V> poll(String name) {
         if (! this.storage.get(name).isDone())
         {
             return null;

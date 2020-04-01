@@ -19,6 +19,10 @@ public class Disk {
         return diskPath;
     }
 
+    public String getAbsolutePathOfDir(String dir) {
+        return this.getDiskPath() + dir;
+    }
+
     public BlockingQueue<File> getReadingQueue() {
         return readingQueue;
     }

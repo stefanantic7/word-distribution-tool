@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Input implements Runnable {
 
-    protected List<Cruncher> crunchers;
+    protected List<Cruncher<?, ?>> crunchers;
 
     protected AtomicBoolean running;
 
@@ -15,11 +15,11 @@ public abstract class Input implements Runnable {
         this.running = new AtomicBoolean(true);
     }
 
-    public void linkCruncher(Cruncher cruncher) {
+    public void linkCruncher(Cruncher<?, ?> cruncher) {
         this.crunchers.add(cruncher);
     }
 
-    public List<Cruncher> getCrunchers() {
+    public List<Cruncher<?, ?>> getCrunchers() {
         return crunchers;
     }
 

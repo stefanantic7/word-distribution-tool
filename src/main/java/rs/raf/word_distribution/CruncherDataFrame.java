@@ -1,49 +1,45 @@
 package rs.raf.word_distribution;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Future;
 
-public class CruncherDataFrame {
+public class CruncherDataFrame<K, V> {
     private final String name;
-    private final Object data;
+    private final Future<Map<K, V>> future;
 
-    public CruncherDataFrame(String name, Object data) {
+    public CruncherDataFrame(String name, Future<Map<K, V>> future) {
         this.name = name;
-        this.data = data;
-    }
-
-    private CruncherDataFrame(String name, Object data, boolean completed) {
-        this.name = name;
-        this.data = data;
+        this.future = future;
     }
 
     public String getName() {
         return name;
     }
 
-    public Object getData() {
-        return data;
+    public Future<Map<K, V>> getFuture() {
+        return future;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CruncherDataFrame that = (CruncherDataFrame) o;
+        CruncherDataFrame<?, ?> that = (CruncherDataFrame<?, ?>) o;
         return Objects.equals(name, that.name) &&
-                Objects.equals(data, that.data);
+                Objects.equals(future, that.future);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, data);
+        return Objects.hash(name, future);
     }
 
     @Override
     public String toString() {
         return "CruncherDataFrame{" +
                 "name='" + name + '\'' +
-                ", data=" + data +
+                ", future=" + future +
                 '}';
     }
 }

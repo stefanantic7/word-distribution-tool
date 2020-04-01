@@ -17,7 +17,11 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
     private static final int LIMIT = Config.COUNTER_DATA_LIMIT;
 
-    public WordCounterTask(int start, int end, String content, int arity, boolean small) {
+    public WordCounterTask(int start, int end, String content, int arity) {
+        this(start, end, content, arity, false);
+    }
+
+    private WordCounterTask(int start, int end, String content, int arity, boolean small) {
         this.start = start;
         this.end = end;
         this.content = content;
@@ -27,89 +31,87 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
     @Override
     protected Map<BagOfWords, Integer> compute() {
-
-        // TODO: use one concurrent map?
+        // TODO: use one concurrent map to optimise memory?
         Map<BagOfWords, Integer> bagsMap = new HashMap<>();
 
-        int contentLength = this.content.length();
-
-        if(start >= contentLength) {
+        if(start >= this.content.length()) {
             return bagsMap;
         }
 
         if (this.small) {
-            // tovari po brojanju i stavi u mapu
-//            synchronized (WordCounterTask.class) {
-//                System.out.println("index1: "+start+", index2: "+end);
-//                System.out.println(content.substring(start, end));
-//            }
-
             bagsMap = this.countWords(start, end);
-        }
-        else {
-
-            // Always will be on the good position (include arity-1 words before)
-            int index1 = start;
-            int index2;
-
-            index2 = index1 + LIMIT;
-
-            while (true) {
-                if (index2 >= contentLength) {
-                    index2 = contentLength;
-                    break;
-                }
-                if (Character.isWhitespace(content.charAt(index2))) {
-                    break;
-                }
-
-                index2++;
-            }
-
-            WordCounterTask forkJob = new WordCounterTask(index1, index2, content, arity, true);
-
-            index1 = index2+1;
-            if(index1 < contentLength) {
-                // Go back to take words before
-                int wordsBefore = this.arity - 1;
-                if (wordsBefore > 0) {
-                    index1 -= 2;
-                }
-                while (true) {
-                    if (index1 <= 0) {
-                        index1 = 0;
-                        break;
-                    }
-                    if (wordsBefore == 0) {
-                        break;
-                    }
-                    if (Character.isWhitespace(this.content.charAt(index1))) {
-                        wordsBefore--;
-                        if (wordsBefore == 0) {
-                            index1++;
-
-                            break;
-                        }
-                    }
-                    index1--;
-                }
-            }
-            boolean isEnd = contentLength - index1-1 <= LIMIT;
-            WordCounterTask computeJob = new WordCounterTask(index1, contentLength, content, arity, isEnd);
-
-
-            forkJob.fork();
-            Map<BagOfWords, Integer> rightResult = computeJob.compute();
-            Map<BagOfWords, Integer> leftResult = forkJob.join();
-
-            // Merging
-            for (Map.Entry<BagOfWords, Integer> entry : rightResult.entrySet()) {
-                leftResult.merge(entry.getKey(), entry.getValue(), Integer::sum);
-            }
-            bagsMap =  leftResult;
+        } else {
+            bagsMap = this.divideWork();
         }
 
         return bagsMap;
+    }
+
+    private Map<BagOfWords, Integer> divideWork() {
+        int contentLength = this.content.length();
+
+        // Pinter will always be on the good position (include arity-1 words before)
+        int index1 = start;
+        int index2;
+
+        index2 = index1 + LIMIT;
+
+        while (true) {
+            if (index2 >= contentLength) {
+                index2 = contentLength;
+                break;
+            }
+            if (Character.isWhitespace(content.charAt(index2))) {
+                break;
+            }
+
+            index2++;
+        }
+
+        WordCounterTask forkJob = new WordCounterTask(index1, index2, content, arity, true);
+
+        index1 = index2+1;
+        if(index1 < contentLength) {
+            // Go back to take words before
+            int wordsBefore = this.arity - 1;
+            if (wordsBefore > 0) {
+                index1 -= 2;
+            }
+            while (true) {
+                if (index1 <= 0) {
+                    index1 = 0;
+                    break;
+                }
+                if (wordsBefore == 0) {
+                    break;
+                }
+                if (Character.isWhitespace(this.content.charAt(index1))) {
+                    wordsBefore--;
+                    if (wordsBefore == 0) {
+                        index1++;
+
+                        break;
+                    }
+                }
+                index1--;
+            }
+        }
+        boolean isEnd = contentLength - index1-1 <= LIMIT;
+        WordCounterTask computeJob = new WordCounterTask(index1, contentLength, content, arity, isEnd);
+
+        forkJob.fork();
+
+        return this.mergeMaps(computeJob.compute(), forkJob.join());
+    }
+
+    /**
+     * Merging operation will put results into leftMap - first parameter.
+     */
+    private Map<BagOfWords, Integer> mergeMaps(Map<BagOfWords, Integer> leftMap, Map<BagOfWords, Integer> rightMap) {
+        for (Map.Entry<BagOfWords, Integer> entry : rightMap.entrySet()) {
+            leftMap.merge(entry.getKey(), entry.getValue(), Integer::sum);
+        }
+        return leftMap;
     }
 
     private Map<BagOfWords, Integer> countWords(int index1, int index2) {

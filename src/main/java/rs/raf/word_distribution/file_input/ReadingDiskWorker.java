@@ -25,18 +25,18 @@ public class ReadingDiskWorker implements Runnable {
                 Future<InputDataFrame> inputDataFrameFuture =
                         this.fileInput.getInputThreadPool().submit(new FileReader(file));
 
-                this.passToCruncher(inputDataFrameFuture.get());
+                this.passToCrunchers(inputDataFrameFuture.get());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void passToCruncher(InputDataFrame inputDataFrame) {
-        List<Cruncher> crunchers = this.fileInput.getCrunchers();
+    private void passToCrunchers(InputDataFrame inputDataFrame) {
+        List<Cruncher<?, ?>> crunchers = this.fileInput.getCrunchers();
 
-        for (Cruncher cruncher: crunchers) {
-            cruncher.putInputDataFrame(inputDataFrame);
+        for (Cruncher<?, ?> cruncher: crunchers) {
+            cruncher.broadcastInputDataFrame(inputDataFrame);
         }
     }
 }
