@@ -25,12 +25,12 @@ public class WordDistributor implements Runnable {
         this.broadcastCruncherDataFrame(cruncherDataFrame);
 
         // TODO: remove gc
-        try {
-            cruncherDataFrame.getFuture().get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        System.gc();
+//        try {
+//            cruncherDataFrame.getFuture().get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//        System.gc();
     }
 
     private CruncherDataFrame<BagOfWords, Integer> generateCruncherDataFrame() {

@@ -29,6 +29,7 @@ public class FileInput extends Input {
     }
 
     public void addDir(File dir) {
+        this.filesByDirMap.put(dir, new CopyOnWriteArrayList<>());
         this.dirs.add(dir);
     }
 

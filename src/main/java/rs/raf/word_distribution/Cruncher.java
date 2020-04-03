@@ -50,4 +50,12 @@ public abstract class Cruncher<K, V> implements Runnable {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "Cruncher{" +
+                "inputDataFrameBlockingQueue=" + inputDataFrameBlockingQueue +
+                ", outputs=" + outputs +
+                '}';
+    }
 }

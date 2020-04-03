@@ -19,6 +19,10 @@ public abstract class Input implements Runnable {
         this.crunchers.add(cruncher);
     }
 
+    public void unlinkCruncher(Cruncher<?, ?> cruncher) {
+        this.crunchers.remove(cruncher);
+    }
+
     public List<Cruncher<?, ?>> getCrunchers() {
         return crunchers;
     }

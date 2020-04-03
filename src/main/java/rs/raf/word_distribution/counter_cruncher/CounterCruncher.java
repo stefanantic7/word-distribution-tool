@@ -34,4 +34,9 @@ public class CounterCruncher extends Cruncher<BagOfWords, Integer> {
     public ForkJoinPool getCruncherThreadPool() {
         return cruncherThreadPool;
     }
+
+    @Override
+    public String toString() {
+        return "CounterCruncher, arity=" + this.getArity();
+    }
 }
