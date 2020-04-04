@@ -3,6 +3,8 @@ package rs.raf.word_distribution.counter_cruncher;
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.InputDataFrame;
 import rs.raf.word_distribution.Output;
+import rs.raf.word_distribution.events.EventManager;
+import rs.raf.word_distribution.events.EventType;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -24,13 +26,15 @@ public class WordDistributor implements Runnable {
 
         this.broadcastCruncherDataFrame(cruncherDataFrame);
 
-        // TODO: remove gc
-//        try {
-//            cruncherDataFrame.getFuture().get();
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//        }
-//        System.gc();
+        EventManager.getInstance().notify(EventType.CRUNCHER_STARTED, counterCruncher, cruncherDataFrame);
+        try {
+            cruncherDataFrame.getFuture().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        EventManager.getInstance().notify(EventType.CRUNCHER_FINISHED, counterCruncher, cruncherDataFrame);
+
     }
 
     private CruncherDataFrame<BagOfWords, Integer> generateCruncherDataFrame() {

@@ -24,6 +24,7 @@ public class CounterCruncher extends Cruncher<BagOfWords, Integer> {
 
     @Override
     public void handle(InputDataFrame inputDataFrame) {
+        System.out.println("handling: "+inputDataFrame.getSource());
         cruncherThreadPool.submit(new WordDistributor(inputDataFrame, this));
     }
 

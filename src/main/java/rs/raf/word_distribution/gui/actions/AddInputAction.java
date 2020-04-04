@@ -1,16 +1,13 @@
 package rs.raf.word_distribution.gui.actions;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import rs.raf.word_distribution.AppCore;
-import rs.raf.word_distribution.Input;
-import rs.raf.word_distribution.Utils;
 import rs.raf.word_distribution.file_input.Disk;
 import rs.raf.word_distribution.file_input.FileInput;
-import rs.raf.word_distribution.gui.views.FileInputsView;
+import rs.raf.word_distribution.file_input.ReadingDiskWorker;
+import rs.raf.word_distribution.gui.views.input.FileInputsView;
 
 public class AddInputAction implements EventHandler<ActionEvent> {
 
@@ -28,6 +25,10 @@ public class AddInputAction implements EventHandler<ActionEvent> {
         FileInput input = new FileInput(diskObjectProperty.get(), AppCore.getInputThreadPool());
         input.pause();
         AppCore.getInputThreadPool().submit(input);
+
+        ReadingDiskWorker readingDiskWorker = new ReadingDiskWorker(input);
+        Thread t = new Thread(readingDiskWorker);
+        t.start();
 
         // TODO: add this in InputView.
         this.fileInputsView.addInputConfiguration(input);

@@ -1,4 +1,4 @@
-package rs.raf.word_distribution.gui.views;
+package rs.raf.word_distribution.gui.views.input;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -72,6 +72,7 @@ public class FileInputsView extends VBox {
     }
 
     public void addInputConfiguration(FileInput fileInput) {
+        VBox inputConfigurationBox = new VBox();
         Label inputNameLabel = new Label("File input: " + fileInput.getDisk().getDiskPath());
         Label crunchersLabel = new Label("Crunchers");
 
@@ -105,13 +106,12 @@ public class FileInputsView extends VBox {
         Button unlinkCruncherButton = new Button("Unlink cruncher");
         unlinkCruncherButton.disableProperty().bind(crunchersListView.getSelectionModel().selectedItemProperty().isNull());
         unlinkCruncherButton.setOnAction(e -> {
-            for (Cruncher<?, ?> cruncher: crunchersListView.getSelectionModel().getSelectedItems()) {
-                fileInput.getCrunchers().remove(cruncher);
-                crunchersListView.getItems().remove(cruncher);
+            Cruncher<?, ?> cruncher = crunchersListView.getSelectionModel().getSelectedItem();
+            fileInput.getCrunchers().remove(cruncher);
+            crunchersListView.getItems().remove(cruncher);
 
-                if(crunchersComboBox.getValue() == cruncher) {
-                    linkCruncherButtonEnabledProperty.set(true);
-                }
+            if(crunchersComboBox.getValue() == cruncher) {
+                linkCruncherButtonEnabledProperty.set(true);
             }
         });
 
@@ -146,7 +146,23 @@ public class FileInputsView extends VBox {
 
 
         Button removeInputButton = new Button("Remove input");
-        Button pauseInputButton = new Button("Pause");
+        removeInputButton.setOnAction(e -> {
+            this.getChildren().remove(inputConfigurationBox);
+            fileInput.destroy();
+            this.allocatedDisksObservableList.remove(fileInput.getDisk());
+        });
+
+
+        Button pauseInputButton = new Button("Start");
+        pauseInputButton.setOnAction(e -> {
+            if (fileInput.isRunning()) {
+                fileInput.pause();
+                pauseInputButton.setText("Start");
+            } else {
+                fileInput.start();
+                pauseInputButton.setText("Pause");
+            }
+        });
 
 
 
@@ -160,8 +176,8 @@ public class FileInputsView extends VBox {
         inputButtonsPane.add(pauseInputButton, 0, 1);
         inputButtonsPane.add(removeInputButton, 1, 1);
 
-
         allocatedDisksObservableList.add(fileInput.getDisk());
-        this.getChildren().addAll(inputNameLabel, crunchersLabel, crunchersListView, cruncherButtonsPane, dirListView, inputButtonsPane);
+        inputConfigurationBox.getChildren().addAll(inputNameLabel, crunchersLabel, crunchersListView, cruncherButtonsPane, dirListView, inputButtonsPane);
+        this.getChildren().addAll(inputConfigurationBox);
     }
 }

@@ -1,0 +1,18 @@
+package rs.raf.word_distribution.events.hanglers;
+
+import javafx.application.Platform;
+import rs.raf.word_distribution.Cruncher;
+import rs.raf.word_distribution.CruncherDataFrame;
+import rs.raf.word_distribution.events.EventListener;
+import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.gui.views.MainStage;
+
+public class RemoveFromCrunchingBox implements EventListener {
+
+    @Override
+    public void handleEvent(EventType eventType, Object... args) {
+        Platform.runLater(() -> {
+            MainStage.getInstance().getCrunchersView().removeCrunchingItem((Cruncher<?, ?>) args[0], (CruncherDataFrame<?, ?>) args[1]);
+        });
+    }
+}

@@ -1,7 +1,10 @@
 package rs.raf.word_distribution.cache_output;
 
+import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.Output;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
+import rs.raf.word_distribution.events.EventManager;
+import rs.raf.word_distribution.events.EventType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +37,6 @@ public class AggregatorTask<K, V> implements Runnable {
         System.out.println("Aggregating " + this.newName);
 
         // TODO: add *
-
         Future<Map<K, V>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
             Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
 
@@ -51,6 +53,8 @@ public class AggregatorTask<K, V> implements Runnable {
         });
 
         this.cacheOutput.store(newName, futureResult);
+        CruncherDataFrame<K, V> cruncherDataFrame = new CruncherDataFrame<>(this.newName, futureResult);
+        EventManager.getInstance().notify(EventType.STORED_CRUNCHER_DATA_FRAME, cruncherDataFrame);
 
         try {
             futureResult.get();
@@ -58,7 +62,6 @@ public class AggregatorTask<K, V> implements Runnable {
             e.printStackTrace();
         }
 
-        // TODO: remove *
-
+        EventManager.getInstance().notify(EventType.AGGREGATION_FINISHED, cruncherDataFrame);
     }
 }

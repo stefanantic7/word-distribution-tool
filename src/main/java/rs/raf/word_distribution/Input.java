@@ -10,9 +10,12 @@ public abstract class Input implements Runnable {
 
     protected AtomicBoolean running;
 
+    protected AtomicBoolean destroyed;
+
     public Input() {
         this.crunchers = new CopyOnWriteArrayList<>();
         this.running = new AtomicBoolean(true);
+        this.destroyed = new AtomicBoolean(false);
     }
 
     public void linkCruncher(Cruncher<?, ?> cruncher) {
@@ -25,6 +28,10 @@ public abstract class Input implements Runnable {
 
     public List<Cruncher<?, ?>> getCrunchers() {
         return crunchers;
+    }
+
+    public boolean isRunning() {
+        return this.running.get();
     }
 
     public abstract void scan();
@@ -61,9 +68,13 @@ public abstract class Input implements Runnable {
         }
     }
 
+    public void destroy() {
+        this.destroyed.set(true);
+    }
+
     @Override
     public void run() {
-        while (true) {
+        while (!this.destroyed.get()) {
             if (this.running.get()) {
                 this.scan();
 
@@ -72,5 +83,6 @@ public abstract class Input implements Runnable {
                 this.stop();
             }
         }
+        // TODO: poison pills
     }
 }
