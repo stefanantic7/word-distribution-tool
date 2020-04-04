@@ -1,21 +1,28 @@
 package rs.raf.word_distribution.gui.views.output;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import rs.raf.word_distribution.AppCore;
+import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.Output;
 import rs.raf.word_distribution.cache_output.CacheOutput;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
+import rs.raf.word_distribution.counter_cruncher.CounterCruncher;
 import rs.raf.word_distribution.gui.tasks.SortResultsTask;
 import rs.raf.word_distribution.gui.views.MainStage;
+import rs.raf.word_distribution.gui.views.cruncher.CrunchingBox;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class OutputView extends VBox {
@@ -44,24 +51,67 @@ public class OutputView extends VBox {
         this.entryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         Button singleResultButton = new Button("Single result");
+        singleResultButton.disableProperty().bind(entryListView.getSelectionModel().selectedItemProperty().isNull());
 
         singleResultButton.setOnAction(e -> {
             Map<BagOfWords, Integer> results = this.output.poll(entryListView.getSelectionModel().getSelectedItem().getOriginalName());
             if (results == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Selected item is still in progress");
+                alert.setContentText("Please wait and try again later.");
+                alert.showAndWait();
                 return;
             }
 
-            Thread ttt = new Thread(new SortResultsTask(results));
+            SortResultsTask sortResultsTask = new SortResultsTask(results);
+
+            ProgressBar progressBar = new ProgressBar();
+            progressBar.progressProperty().bind(sortResultsTask.progressProperty());
+            sortResultsTask.setOnSucceeded(event -> {
+                this.getChildren().remove(progressBar);
+            });
+
+            Thread ttt = new Thread(sortResultsTask);
             ttt.start();
 
+            this.getChildren().add(progressBar);
         });
 
 
         Button sumResultButton = new Button("Sum result");
+        sumResultButton.disableProperty().bind(entryListView.getSelectionModel().selectedItemProperty().isNull());
 
         sumResultButton.setOnAction(e -> {
-            List<String> selected = entryListView.getSelectionModel().getSelectedItems().stream().map(OutputListItem::getOriginalName).collect(Collectors.toList());
-            this.output.aggregate("newName", selected, Integer::sum);
+            TextInputDialog dialog = new TextInputDialog("1");
+            dialog.setTitle("Confirmation");
+            dialog.setHeaderText("Enter sum name");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(sumName -> {
+                ProgressBar progressBar = new ProgressBar();
+                progressBar.setProgress(0);
+
+                List<String> selected = entryListView.getSelectionModel().getSelectedItems().stream()
+                        .map(OutputListItem::getOriginalName).collect(Collectors.toList());
+                AtomicInteger finishedItems = new AtomicInteger(0);
+                this.output.aggregate(sumName, selected, Integer::sum, new Function<String, Void>() {
+                    @Override
+                    public Void apply(String s) {
+                        int finished = finishedItems.incrementAndGet();;
+                        Platform.runLater(() -> {
+                            progressBar.setProgress(finished / (float)selected.size());
+
+                            if (finished / (float) selected.size() == 1) {
+                                getChildren().remove(progressBar);
+                            }
+                        });
+                        return null;
+                    }
+                });
+
+                this.getChildren().add(progressBar);
+            });
         });
 
         this.getChildren().addAll(entryListView, singleResultButton, sumResultButton);

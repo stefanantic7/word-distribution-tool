@@ -2,6 +2,8 @@ package rs.raf.word_distribution.gui.tasks;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.scene.control.ProgressBar;
+import rs.raf.word_distribution.Config;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
 import rs.raf.word_distribution.gui.views.MainStage;
 
@@ -24,12 +26,18 @@ public class SortResultsTask extends Task<Map<Number, Number>> {
         });
     }
 
+    long n = 0;
+
     @Override
     protected Map<Number, Number> call() throws Exception {
         List<Map.Entry<BagOfWords, Integer>> entryList = new ArrayList<>(this.results.entrySet());
         entryList.sort(new Comparator<Map.Entry<BagOfWords, Integer>>() {
             @Override
             public int compare(Map.Entry<BagOfWords, Integer> item1, Map.Entry<BagOfWords, Integer> item2) {
+                n++;
+                if(n % Config.SORT_PROGRESS_LIMIT == 0) {
+                    updateProgress(n, results.size()*Math.log(results.size()));
+                }
                 return -Integer.compare(item1.getValue(), item2.getValue());
             }
         });

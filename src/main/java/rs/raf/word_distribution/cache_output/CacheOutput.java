@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class CacheOutput<K, V> extends Output<K, V> {
 
@@ -28,8 +29,8 @@ public class CacheOutput<K, V> extends Output<K, V> {
         outputThreadPool.submit(new StoreOutputTask<>(this, cruncherDataFrame));
     }
 
-    public void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction) {
-        outputThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction));
+    public void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction, Function<String, Void> itemProcessedCallback) {
+        outputThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction, itemProcessedCallback));
     }
 
     @Override

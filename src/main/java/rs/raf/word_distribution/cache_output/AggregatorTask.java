@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class AggregatorTask<K, V> implements Runnable {
 
@@ -22,21 +23,25 @@ public class AggregatorTask<K, V> implements Runnable {
     private CacheOutput<K, V> cacheOutput;
 
     private final BiFunction<V, V, V> aggregatingFunction;
+
+    private Function<String, Void> itemProcessedCallback;
+
     public AggregatorTask(String newName,
                           List<String> existingResults,
                           CacheOutput<K, V> cacheOutput,
-                          BiFunction<V, V, V> aggregatingFunction) {
+                          BiFunction<V, V, V> aggregatingFunction,
+                          Function<String, Void> itemProcessedCallback) {
         this.newName = newName;
         this.existingResults = existingResults;
         this.cacheOutput = cacheOutput;
         this.aggregatingFunction = aggregatingFunction;
+        this.itemProcessedCallback = itemProcessedCallback;
     }
 
     @Override
     public void run() {
         System.out.println("Aggregating " + this.newName);
 
-        // TODO: add *
         Future<Map<K, V>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
             Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
 
@@ -47,6 +52,8 @@ public class AggregatorTask<K, V> implements Runnable {
                 for (Map.Entry<K, V> entry : existingMap.entrySet()) {
                     bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), this.aggregatingFunction);
                 }
+
+                itemProcessedCallback.apply(existingResult);
             }
 
             return bagOfWordsIntegerMap;

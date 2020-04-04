@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public abstract class Output<K, V> implements Runnable {
     protected BlockingQueue<CruncherDataFrame<K, V>> cruncherDataFrameBlockingQueue;
@@ -25,7 +26,7 @@ public abstract class Output<K, V> implements Runnable {
 
     public abstract Map<K, V> poll(String name);
 
-    public abstract void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction);
+    public abstract void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction, Function<String, Void> itemProcessedCallback);
 
     public void putCruncherDataFrame(CruncherDataFrame<K, V> cruncherDataFrame) {
         this.cruncherDataFrameBlockingQueue.add(cruncherDataFrame);
