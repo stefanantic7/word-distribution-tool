@@ -20,6 +20,7 @@ import rs.raf.word_distribution.gui.views.MainStage;
 import rs.raf.word_distribution.gui.views.cruncher.CrunchingBox;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -33,7 +34,7 @@ public class OutputView extends VBox {
     private Map<CruncherDataFrame<?, ?>, OutputListItem> cruncherDataFrameOutputListItemMap;
 
     public OutputView() {
-        this.cruncherDataFrameOutputListItemMap = new HashMap<>();
+        this.cruncherDataFrameOutputListItemMap = new ConcurrentHashMap<>();
         this.setSpacing(5);
         this.setPadding(new Insets(5));
         this.init();
@@ -95,19 +96,16 @@ public class OutputView extends VBox {
                 List<String> selected = entryListView.getSelectionModel().getSelectedItems().stream()
                         .map(OutputListItem::getOriginalName).collect(Collectors.toList());
                 AtomicInteger finishedItems = new AtomicInteger(0);
-                this.output.aggregate(sumName, selected, Integer::sum, new Function<String, Void>() {
-                    @Override
-                    public Void apply(String s) {
-                        int finished = finishedItems.incrementAndGet();;
-                        Platform.runLater(() -> {
-                            progressBar.setProgress(finished / (float)selected.size());
+                this.output.aggregate(sumName, selected, Integer::sum, s -> {
+                    int finished = finishedItems.incrementAndGet();
+                    Platform.runLater(() -> {
+                        progressBar.setProgress(finished / (float)selected.size());
 
-                            if (finished / (float) selected.size() == 1) {
-                                getChildren().remove(progressBar);
-                            }
-                        });
-                        return null;
-                    }
+                        if (finished / (float) selected.size() == 1) {
+                            getChildren().remove(progressBar);
+                        }
+                    });
+                    return null;
                 });
 
                 this.getChildren().add(progressBar);
@@ -117,16 +115,23 @@ public class OutputView extends VBox {
         this.getChildren().addAll(entryListView, singleResultButton, sumResultButton);
     }
 
-    public void addNewItem(CruncherDataFrame<?, ?> cruncherDataFrame) {
-        OutputListItem outputListItem = new OutputListItem(cruncherDataFrame.getName());
-        outputListItem.setTitle(outputListItem.getOriginalName() + "*");
-        this.cruncherDataFrameOutputListItemMap.put(cruncherDataFrame, outputListItem);
+    public synchronized void addNewItem(CruncherDataFrame<?, ?> cruncherDataFrame) {
+        OutputListItem newOutputListItem = new OutputListItem(cruncherDataFrame.getName());
+        newOutputListItem.setTitle("*" + newOutputListItem.getOriginalName());
 
-        this.entryListView.getItems().add(outputListItem);
+        OutputListItem outputListItem = this.cruncherDataFrameOutputListItemMap.putIfAbsent(cruncherDataFrame, newOutputListItem);
+
+        if (outputListItem == null) {
+            this.entryListView.getItems().add(newOutputListItem);
+        }
     }
 
-    public void changeItemToFinished(CruncherDataFrame<?, ?> cruncherDataFrame) {
+    public synchronized void changeItemToFinished(CruncherDataFrame<?, ?> cruncherDataFrame) {
+        OutputListItem newOutputListItem = new OutputListItem(cruncherDataFrame.getName());
+        this.cruncherDataFrameOutputListItemMap.putIfAbsent(cruncherDataFrame, newOutputListItem);
+
         OutputListItem outputListItem = this.cruncherDataFrameOutputListItemMap.get(cruncherDataFrame);
+
         outputListItem.setTitle(cruncherDataFrame.getName());
         this.entryListView.refresh();
     }

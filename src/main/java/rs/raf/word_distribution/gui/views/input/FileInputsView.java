@@ -13,8 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -73,6 +73,10 @@ public class FileInputsView extends VBox {
 
     public void addInputConfiguration(FileInput fileInput) {
         VBox inputConfigurationBox = new VBox();
+        inputConfigurationBox.setBorder(new Border(new BorderStroke(Color.LIGHTBLUE,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+        inputConfigurationBox.setPadding(new Insets(10,  10,10,10));
         Label inputNameLabel = new Label("File input: " + fileInput.getDisk().getDiskPath());
         Label crunchersLabel = new Label("Crunchers");
 
@@ -116,7 +120,8 @@ public class FileInputsView extends VBox {
         });
 
         GridPane cruncherButtonsPane = new GridPane();
-        cruncherButtonsPane.setVgap(5);
+        cruncherButtonsPane.setPadding(new Insets(10, 0, 10, 0));
+        cruncherButtonsPane.setVgap(10);
         cruncherButtonsPane.setHgap(10);
         cruncherButtonsPane.add(crunchersComboBox, 0, 0);
         cruncherButtonsPane.add(linkCruncherButton, 1, 0);
@@ -169,7 +174,8 @@ public class FileInputsView extends VBox {
 
 
         GridPane inputButtonsPane = new GridPane();
-        inputButtonsPane.setVgap(5);
+        inputButtonsPane.setPadding(new Insets(10, 0, 10, 0));
+        inputButtonsPane.setVgap(10);
         inputButtonsPane.setHgap(10);
         inputButtonsPane.add(addDirButton, 0, 0);
         inputButtonsPane.add(removeDirButton, 1, 0);

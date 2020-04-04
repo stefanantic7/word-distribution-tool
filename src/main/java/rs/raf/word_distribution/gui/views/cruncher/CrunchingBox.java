@@ -8,13 +8,18 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CrunchingBox extends VBox {
 
-    ObservableList<String> items;
+    private ObservableList<String> items;
+
+    private Map<String, Boolean> removed;
 
     public CrunchingBox() {
         this.items = FXCollections.observableArrayList();
+        this.removed = new ConcurrentHashMap<>();
 
         this.init();
     }
@@ -42,11 +47,15 @@ public class CrunchingBox extends VBox {
         this.getChildren().add(itemsBox);
     }
 
-    public void add(String item) {
-        this.items.add(item);
+    public synchronized void add(String item) {
+        Boolean isRemoved = this.removed.get(item);
+        if (isRemoved == null) {
+            this.items.add(item);
+        }
     }
 
-    public void remove(String item) {
+    public synchronized void remove(String item) {
+        this.removed.put(item, true);
         this.items.remove(item);
     }
 
