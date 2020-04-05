@@ -11,14 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CrunchingBox extends VBox {
+public class CrunchingListView extends VBox {
 
     private ObservableList<String> items;
 
     private Map<String, Boolean> removed;
 
-    public CrunchingBox() {
-        this.items = FXCollections.observableArrayList();
+    public CrunchingListView() {
+        this(FXCollections.observableArrayList());
+    }
+
+    public CrunchingListView(ObservableList<String> items) {
+        this.items = items;
         this.removed = new ConcurrentHashMap<>();
 
         this.init();

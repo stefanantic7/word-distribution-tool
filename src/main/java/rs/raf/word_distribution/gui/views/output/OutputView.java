@@ -1,29 +1,19 @@
 package rs.raf.word_distribution.gui.views.output;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import rs.raf.word_distribution.AppCore;
-import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.Output;
 import rs.raf.word_distribution.cache_output.CacheOutput;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
-import rs.raf.word_distribution.counter_cruncher.CounterCruncher;
 import rs.raf.word_distribution.gui.tasks.SortResultsTask;
-import rs.raf.word_distribution.gui.views.MainStage;
-import rs.raf.word_distribution.gui.views.cruncher.CrunchingBox;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class OutputView extends VBox {

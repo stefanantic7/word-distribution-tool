@@ -1,10 +1,12 @@
 package rs.raf.word_distribution.gui.views;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.gui.views.cruncher.CrunchersView;
 import rs.raf.word_distribution.gui.views.input.FileInputsView;
 import rs.raf.word_distribution.gui.views.output.ChartResultView;

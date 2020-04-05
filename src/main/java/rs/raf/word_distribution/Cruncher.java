@@ -1,13 +1,14 @@
 package rs.raf.word_distribution;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Cruncher<K, V> implements Runnable {
 
-    protected BlockingQueue<InputDataFrame> inputDataFrameBlockingQueue;
+    protected BlockingQueue<Optional<InputDataFrame>> inputDataFrameBlockingQueue;
 
     protected List<Output<K, V>> outputs;
 
@@ -35,19 +36,32 @@ public abstract class Cruncher<K, V> implements Runnable {
     }
 
     public void broadcastInputDataFrame(InputDataFrame inputDataFrame) {
-        this.inputDataFrameBlockingQueue.add(inputDataFrame);
+        this.inputDataFrameBlockingQueue.add(Optional.of(inputDataFrame));
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                InputDataFrame inputDataFrame = inputDataFrameBlockingQueue.take();
+                Optional<InputDataFrame> inputDataFrameOptional = inputDataFrameBlockingQueue.take();
+                if (inputDataFrameOptional.isEmpty()) {
+                    break;
+                }
+                InputDataFrame inputDataFrame = inputDataFrameOptional.get();
+
                 System.out.println("Cruncher will handle: " + inputDataFrame.getSource());
                 this.handle(inputDataFrame);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void destroy() {
+        try {
+            inputDataFrameBlockingQueue.put(Optional.ofNullable(null));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
