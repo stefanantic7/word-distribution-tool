@@ -4,6 +4,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import rs.raf.word_distribution.CruncherDataFrame;
 
+import java.util.Objects;
+
 public class OutputListItem {
     private String title;
 
@@ -33,5 +35,18 @@ public class OutputListItem {
     @Override
     public String toString() {
         return this.title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OutputListItem that = (OutputListItem) o;
+        return Objects.equals(originalName, that.originalName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(originalName);
     }
 }

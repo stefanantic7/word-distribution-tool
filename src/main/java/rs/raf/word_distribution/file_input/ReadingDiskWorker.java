@@ -2,6 +2,8 @@ package rs.raf.word_distribution.file_input;
 
 import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.InputDataFrame;
+import rs.raf.word_distribution.events.EventManager;
+import rs.raf.word_distribution.events.EventType;
 
 import java.io.File;
 import java.util.List;
@@ -26,11 +28,15 @@ public class ReadingDiskWorker implements Runnable {
                     break;
                 }
                 File file = optionalFile.get();
-
+                /// READING
+                EventManager.getInstance().notify(EventType.READING_STARTED, this.fileInput, file);
                 Future<InputDataFrame> inputDataFrameFuture =
                         this.fileInput.getInputThreadPool().submit(new FileReader(file));
 
                 this.passToCrunchers(inputDataFrameFuture.get());
+
+                //// idle
+                EventManager.getInstance().notify(EventType.READING_FINISHED, this.fileInput, file);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }

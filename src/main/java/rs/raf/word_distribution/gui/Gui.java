@@ -1,6 +1,7 @@
 package rs.raf.word_distribution.gui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import rs.raf.word_distribution.gui.views.MainStage;
 

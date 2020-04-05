@@ -68,7 +68,8 @@ public abstract class Input implements Runnable {
         }
     }
 
-    public void destroy() {
+    public synchronized void destroy() {
+        this.notify();
         this.destroyed.set(true);
     }
 

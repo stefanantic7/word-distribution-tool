@@ -1,24 +1,25 @@
 package rs.raf.word_distribution.gui.actions.input;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import rs.raf.word_distribution.file_input.Disk;
+import rs.raf.word_distribution.file_input.FileInput;
 
 public class ChooseDiskAction implements EventHandler<ActionEvent> {
 
     private ComboBox<Disk> diskComboBox;
     private BooleanProperty addFileInputButtonEnabledProperty;
-    private ObservableList<Disk> allocatedDisksObservableList;
+    private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
 
     public ChooseDiskAction(ComboBox<Disk> diskComboBox,
                             BooleanProperty addFileInputButtonEnabledProperty,
-                            ObservableList<Disk> allocatedDisksObservableList) {
+                            ObservableMap<FileInput, Disk> fileInputDiskObservableMap) {
         this.diskComboBox = diskComboBox;
         this.addFileInputButtonEnabledProperty = addFileInputButtonEnabledProperty;
-        this.allocatedDisksObservableList = allocatedDisksObservableList;
+        this.fileInputDiskObservableMap = fileInputDiskObservableMap;
     }
 
     @Override
@@ -26,7 +27,7 @@ public class ChooseDiskAction implements EventHandler<ActionEvent> {
         if (diskComboBox.valueProperty().isNull().get()) {
             addFileInputButtonEnabledProperty.set(false);
         } else {
-            addFileInputButtonEnabledProperty.set(!this.allocatedDisksObservableList.contains(diskComboBox.getValue()));
+            addFileInputButtonEnabledProperty.set(!this.fileInputDiskObservableMap.containsValue(diskComboBox.getValue()));
         }
     }
 }

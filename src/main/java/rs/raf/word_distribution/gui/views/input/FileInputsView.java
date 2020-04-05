@@ -2,34 +2,35 @@ package rs.raf.word_distribution.gui.views.input;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.beans.property.StringProperty;
+import javafx.collections.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
 import rs.raf.word_distribution.Config;
 import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.file_input.Disk;
 import rs.raf.word_distribution.file_input.FileInput;
 import rs.raf.word_distribution.gui.actions.input.*;
 
-import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class FileInputsView extends VBox {
 
-    private ObservableList<Disk> allocatedDisksObservableList;
-
+    private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
+    private Map<FileInput, StringProperty> fileInputCurrentProcessMap;
     private ObservableList<Cruncher<?, ?>> cruncherObservableList;
+
 
     public FileInputsView(ObservableList<Cruncher<?, ?>> cruncherObservableList) {
         this.cruncherObservableList = cruncherObservableList;
-        this.allocatedDisksObservableList = FXCollections.observableArrayList();
+        this.fileInputCurrentProcessMap = new HashMap<>();
+        this.fileInputDiskObservableMap = FXCollections.observableHashMap();
 
         this.init();
     }
@@ -45,11 +46,10 @@ public class FileInputsView extends VBox {
         ComboBox<Disk> diskComboBox = new ComboBox<>(FXCollections.observableArrayList(Config.DISKS));
 
         diskComboBox.setOnAction(
-                new ChooseDiskAction(diskComboBox, addFileInputButtonEnabledProperty, allocatedDisksObservableList)
+                new ChooseDiskAction(diskComboBox, addFileInputButtonEnabledProperty, fileInputDiskObservableMap)
         );
-        this.allocatedDisksObservableList.addListener((ListChangeListener<Disk>) c -> {
-            c.next();
-            addFileInputButtonEnabledProperty.set(!this.allocatedDisksObservableList.contains(diskComboBox.getValue()));
+        this.fileInputDiskObservableMap.addListener((MapChangeListener<FileInput, Disk>) change -> {
+            addFileInputButtonEnabledProperty.set(!this.fileInputDiskObservableMap.containsValue(diskComboBox.getValue()));
         });
 
 
@@ -58,11 +58,30 @@ public class FileInputsView extends VBox {
         addFileInputButton.setOnAction(
                 new AddInputAction(this,
                         diskComboBox.valueProperty(),
-                        this.allocatedDisksObservableList,
+                        this.fileInputDiskObservableMap,
                         this.cruncherObservableList)
         );
 
 
         this.getChildren().addAll(fileInputsLabel, diskComboBox, addFileInputButton);
+    }
+
+    public Set<FileInput> getFileInputsSet() {
+        return fileInputDiskObservableMap.keySet();
+    }
+
+    public void registerNewInput(FileInput fileInput, StringProperty currentProgressProperty) {
+        this.fileInputDiskObservableMap.put(fileInput, fileInput.getDisk());
+        this.fileInputCurrentProcessMap.put(fileInput, currentProgressProperty);
+    }
+
+    public void updateProcessStatus(FileInput fileInput, String newProcessStatus) {
+        StringProperty progressStatus = this.fileInputCurrentProcessMap.get(fileInput);
+        if (newProcessStatus == null) {
+            progressStatus.set("idle");
+        } else {
+            progressStatus.set(newProcessStatus);
+        }
+
     }
 }

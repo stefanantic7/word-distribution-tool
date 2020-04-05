@@ -15,15 +15,12 @@ public class CrunchingListView extends VBox {
 
     private ObservableList<String> items;
 
-    private Map<String, Boolean> removed;
-
     public CrunchingListView() {
         this(FXCollections.observableArrayList());
     }
 
     public CrunchingListView(ObservableList<String> items) {
         this.items = items;
-        this.removed = new ConcurrentHashMap<>();
 
         this.init();
     }
@@ -51,15 +48,11 @@ public class CrunchingListView extends VBox {
         this.getChildren().add(itemsBox);
     }
 
-    public synchronized void add(String item) {
-        Boolean isRemoved = this.removed.get(item);
-        if (isRemoved == null) {
-            this.items.add(item);
-        }
+    public void add(String item) {
+        this.items.add(item);
     }
 
-    public synchronized void remove(String item) {
-        this.removed.put(item, true);
+    public void remove(String item) {
         this.items.remove(item);
     }
 

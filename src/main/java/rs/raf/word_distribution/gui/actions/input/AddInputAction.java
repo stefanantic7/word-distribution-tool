@@ -2,13 +2,13 @@ package rs.raf.word_distribution.gui.actions.input;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import rs.raf.word_distribution.AppCore;
 import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.file_input.Disk;
 import rs.raf.word_distribution.file_input.FileInput;
-import rs.raf.word_distribution.file_input.ReadingDiskWorker;
 import rs.raf.word_distribution.gui.views.input.FileInputsView;
 import rs.raf.word_distribution.gui.views.input.InputConfigurationBox;
 
@@ -16,16 +16,16 @@ public class AddInputAction implements EventHandler<ActionEvent> {
 
     private FileInputsView fileInputsView;
     private ObjectProperty<Disk> diskObjectProperty;
-    private ObservableList<Disk> allocatedDisksObservableList;
+    private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
     private ObservableList<Cruncher<?, ?>> cruncherObservableList;
 
     public AddInputAction(FileInputsView fileInputsView,
                           ObjectProperty<Disk> diskObjectProperty,
-                          ObservableList<Disk> allocatedDisksObservableList,
+                          ObservableMap<FileInput, Disk> fileInputDiskObservableMap,
                           ObservableList<Cruncher<?, ?>> cruncherObservableList) {
         this.fileInputsView = fileInputsView;
         this.diskObjectProperty = diskObjectProperty;
-        this.allocatedDisksObservableList = allocatedDisksObservableList;
+        this.fileInputDiskObservableMap = fileInputDiskObservableMap;
         this.cruncherObservableList = cruncherObservableList;
     }
 
@@ -35,10 +35,10 @@ public class AddInputAction implements EventHandler<ActionEvent> {
         fileInput.pause();
         AppCore.getInputThreadPool().submit(fileInput);
 
-        this.allocatedDisksObservableList.add(fileInput.getDisk());
-
         InputConfigurationBox inputConfigurationBox
-                = new InputConfigurationBox(fileInput, this.cruncherObservableList, this.allocatedDisksObservableList);
+                = new InputConfigurationBox(fileInput, this.cruncherObservableList, this.fileInputDiskObservableMap);
+
+        this.fileInputsView.registerNewInput(fileInput, inputConfigurationBox.getIdleLabel().textProperty());
 
         this.fileInputsView.getChildren().addAll(inputConfigurationBox);
     }

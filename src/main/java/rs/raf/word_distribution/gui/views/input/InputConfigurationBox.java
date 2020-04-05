@@ -2,7 +2,9 @@ package rs.raf.word_distribution.gui.views.input;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,14 +23,15 @@ public class InputConfigurationBox extends VBox {
 
     private FileInput fileInput;
     private ObservableList<Cruncher<?, ?>> cruncherObservableList;
-    private ObservableList<Disk> allocatedDisksObservableList;
+    private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
+    private Label idleLabel;
 
     public InputConfigurationBox(FileInput fileInput,
                                  ObservableList<Cruncher<?, ?>> cruncherObservableList,
-                                 ObservableList<Disk> allocatedDisksObservableList) {
+                                 ObservableMap<FileInput, Disk> fileInputDiskObservableMap) {
         this.fileInput = fileInput;
         this.cruncherObservableList = cruncherObservableList;
-        this.allocatedDisksObservableList = allocatedDisksObservableList;
+        this.fileInputDiskObservableMap = fileInputDiskObservableMap;
         this.init();
     }
 
@@ -96,7 +99,7 @@ public class InputConfigurationBox extends VBox {
         Button removeInputButton = new Button("Remove input");
 
         removeInputButton.setOnAction(
-                new RemoveInputAction(this, fileInput, allocatedDisksObservableList)
+                new RemoveInputAction(this, fileInput, fileInputDiskObservableMap)
         );
 
 
@@ -114,6 +117,13 @@ public class InputConfigurationBox extends VBox {
         inputButtonsPane.add(pauseStartButton, 0, 1);
         inputButtonsPane.add(removeInputButton, 1, 1);
 
-        this.getChildren().addAll(inputNameLabel, crunchersLabel, crunchersListView, cruncherButtonsPane, dirListView, inputButtonsPane);
+        this.idleLabel = new Label("Idle");
+
+        this.getChildren().addAll(inputNameLabel, crunchersLabel, crunchersListView, cruncherButtonsPane,
+                dirListView, inputButtonsPane, idleLabel);
+    }
+
+    public Label getIdleLabel() {
+        return idleLabel;
     }
 }

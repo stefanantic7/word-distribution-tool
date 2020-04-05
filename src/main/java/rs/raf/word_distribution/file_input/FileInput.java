@@ -47,19 +47,18 @@ public class FileInput extends Input {
     @Override
     public void scan() {
         for (File file : this.dirs) {
-            this.filesByDirMap.put(file, new CopyOnWriteArrayList<>());
-            this.scanDirContent(file);
+            this.scanDirContent(file, file);
         }
     }
 
-    private void scanDirContent(File dir) {
+    private void scanDirContent(File dir, File parentDir) {
         File[] files = dir.listFiles();
 
         for (File file : files) {
             if (file.isDirectory()) {
-                this.scanDirContent(file);
+                this.scanDirContent(file, parentDir);
             } else if (Utils.getExtension(file.getName()).equals("txt")) {
-                this.filesByDirMap.get(dir).add(file);
+                this.filesByDirMap.get(parentDir).add(file);
                 this.checkForReading(file);
             }
         }

@@ -23,7 +23,7 @@ public class OutputView extends VBox {
     private Output<BagOfWords, Integer> output;
 
     private ListView<OutputListItem> entryListView;
-    private Map<CruncherDataFrame<?, ?>, OutputListItem> cruncherDataFrameOutputListItemMap;
+    private Map<String, OutputListItem> cruncherDataFrameOutputListItemMap;
 
     public OutputView() {
         this.cruncherDataFrameOutputListItemMap = new ConcurrentHashMap<>();
@@ -67,7 +67,7 @@ public class OutputView extends VBox {
         OutputListItem newOutputListItem = new OutputListItem(cruncherDataFrame.getName());
         newOutputListItem.setTitle("*" + newOutputListItem.getOriginalName());
 
-        OutputListItem outputListItem = this.cruncherDataFrameOutputListItemMap.putIfAbsent(cruncherDataFrame, newOutputListItem);
+        OutputListItem outputListItem = this.cruncherDataFrameOutputListItemMap.putIfAbsent(cruncherDataFrame.getName(), newOutputListItem);
 
         if (outputListItem == null) {
             this.entryListView.getItems().add(newOutputListItem);
@@ -76,9 +76,9 @@ public class OutputView extends VBox {
 
     public synchronized void changeItemToFinished(CruncherDataFrame<?, ?> cruncherDataFrame) {
         OutputListItem newOutputListItem = new OutputListItem(cruncherDataFrame.getName());
-        this.cruncherDataFrameOutputListItemMap.putIfAbsent(cruncherDataFrame, newOutputListItem);
+        this.cruncherDataFrameOutputListItemMap.putIfAbsent(cruncherDataFrame.getName(), newOutputListItem);
 
-        OutputListItem outputListItem = this.cruncherDataFrameOutputListItemMap.get(cruncherDataFrame);
+        OutputListItem outputListItem = this.cruncherDataFrameOutputListItemMap.get(cruncherDataFrame.getName());
 
         outputListItem.setTitle(cruncherDataFrame.getName());
         this.entryListView.refresh();
