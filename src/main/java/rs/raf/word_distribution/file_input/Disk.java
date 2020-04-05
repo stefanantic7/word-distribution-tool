@@ -2,13 +2,14 @@ package rs.raf.word_distribution.file_input;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Disk {
     private final String diskPath;
 
-    private final BlockingQueue<File> readingQueue;
+    private final BlockingQueue<Optional<File>> readingQueue;
 
     public Disk(String diskPath) {
         this.diskPath = diskPath;
@@ -24,7 +25,7 @@ public class Disk {
         return this.getDiskPath() + dir;
     }
 
-    public BlockingQueue<File> getReadingQueue() {
+    public BlockingQueue<Optional<File>> getReadingQueue() {
         return readingQueue;
     }
 

@@ -83,6 +83,5 @@ public abstract class Input implements Runnable {
                 this.stop();
             }
         }
-        // TODO: poison pills
     }
 }

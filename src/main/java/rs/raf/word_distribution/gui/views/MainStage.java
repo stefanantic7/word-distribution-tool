@@ -44,6 +44,7 @@ public class MainStage extends Stage {
         HBox fileInputsAndCrunchersHBox = new HBox(5, fileInputsView, crunchersView);
 
         BorderPane borderPane = new BorderPane();
+
         borderPane.setLeft(fileInputsAndCrunchersHBox);
         borderPane.setCenter(chartResultView);
         borderPane.setRight(outputView);

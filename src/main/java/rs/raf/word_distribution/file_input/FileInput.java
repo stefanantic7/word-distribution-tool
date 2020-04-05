@@ -19,6 +19,8 @@ public class FileInput extends Input {
 
     private Map<File, List<File>> filesByDirMap;
 
+    private ReadingDiskWorker readingDiskWorker;
+
     public FileInput(Disk disc, ExecutorService inputThreadPool) {
         super();
         this.disk = disc;
@@ -26,6 +28,9 @@ public class FileInput extends Input {
         this.inputThreadPool = inputThreadPool;
         this.lastModifiedMap = new ConcurrentHashMap<>();
         this.filesByDirMap = new ConcurrentHashMap<>();
+
+        this.readingDiskWorker = new ReadingDiskWorker(this);
+        inputThreadPool.submit(readingDiskWorker);
     }
 
     public void addDir(File dir) {
@@ -67,17 +72,23 @@ public class FileInput extends Input {
         if (modifiedAt == null || !modifiedAt.equals(lastModified)) {
             this.dispatchReading(file);
         }
-
     }
 
     private void dispatchReading(File file) {
-        System.out.println("Dispatching file: " + file.getPath());
+        System.out.println("Dispatching file to reading queue: " + file.getPath());
 
         try {
-            this.disk.getReadingQueue().put(file);
+            this.disk.getReadingQueue().put(Optional.of(file));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+
+        this.readingDiskWorker.destroy();
     }
 
     public Disk getDisk() {
