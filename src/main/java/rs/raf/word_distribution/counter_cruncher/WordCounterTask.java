@@ -31,20 +31,24 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
     @Override
     protected Map<BagOfWords, Integer> compute() {
-        // TODO: use one concurrent map to optimise memory?
-        Map<BagOfWords, Integer> bagsMap = new HashMap<>();
+        try {
+            Map<BagOfWords, Integer> bagsMap = new HashMap<>();
 
-        if(start >= this.content.length()) {
+            if(start >= this.content.length()) {
+                return bagsMap;
+            }
+
+            if (this.small) {
+                bagsMap = this.countWords(start, end);
+            } else {
+                bagsMap = this.divideWork();
+            }
+
             return bagsMap;
+        } catch (OutOfMemoryError outOfMemoryError) {
+            outOfMemoryError.printStackTrace();
         }
-
-        if (this.small) {
-            bagsMap = this.countWords(start, end);
-        } else {
-            bagsMap = this.divideWork();
-        }
-
-        return bagsMap;
+        return null;
     }
 
     private Map<BagOfWords, Integer> divideWork() {
@@ -119,9 +123,7 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
         List<String> words = this.extractWords(index1, index2);
 
-//        System.out.println(words);
 
-        //TODO: remove pointer(item) from list?
         for (int i = 0; i < (words.size() - (this.arity-1)); i++) {
             BagOfWords bagOfWords = new BagOfWords(this.arity);
             for (int j = i; j < i + this.arity; j++) {

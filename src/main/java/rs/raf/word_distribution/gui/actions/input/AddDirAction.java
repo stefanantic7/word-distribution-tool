@@ -25,6 +25,10 @@ public class AddDirAction implements EventHandler<ActionEvent> {
         directoryChooser.setInitialDirectory(new File(this.fileInput.getDisk().getDiskPath()));
         File selectedFile = directoryChooser.showDialog(null);
 
+        if (selectedFile == null) {
+            return;
+        }
+
         this.fileInput.addDir(selectedFile);
         this.dirListView.getItems().add(selectedFile);
     }

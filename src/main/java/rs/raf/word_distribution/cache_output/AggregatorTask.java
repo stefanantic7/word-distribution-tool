@@ -40,6 +40,14 @@ public class AggregatorTask<K, V> implements Runnable {
 
     @Override
     public void run() {
+        try {
+            this.aggregate();
+        } catch (OutOfMemoryError outOfMemoryError) {
+            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
+        }
+    }
+
+    private void aggregate() {
         System.out.println("Aggregating " + this.newName);
 
         Future<Map<K, V>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
@@ -65,6 +73,8 @@ public class AggregatorTask<K, V> implements Runnable {
 
         try {
             futureResult.get();
+        } catch (OutOfMemoryError outOfMemoryError) {
+            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
