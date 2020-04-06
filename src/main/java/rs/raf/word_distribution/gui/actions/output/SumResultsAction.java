@@ -3,6 +3,7 @@ package rs.raf.word_distribution.gui.actions.output;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextInputDialog;
 import rs.raf.word_distribution.gui.views.output.OutputListItem;
@@ -29,6 +30,16 @@ public class SumResultsAction implements EventHandler<ActionEvent> {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(sumName -> {
+
+            if(this.outputView.getEntryListView().getItems().contains(new OutputListItem(sumName))) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("The name already exists");
+                alert.setContentText("Please enter another one.");
+                alert.showAndWait();
+                return;
+            }
+
             ProgressBar progressBar = new ProgressBar();
             progressBar.setProgress(0);
 

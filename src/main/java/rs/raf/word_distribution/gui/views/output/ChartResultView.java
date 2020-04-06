@@ -30,21 +30,22 @@ public class ChartResultView extends StackPane {
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Word");
 
-        this. lineChart = new LineChart<>(xAxis,yAxis);
+        this.lineChart = new LineChart<>(xAxis,yAxis);
 
-        this.updateData();
+        this.updateData("");
 
         this.getChildren().add(lineChart);
     }
 
-    public void updateResult(Map<Number, Number> results) {
+    public void updateResult(Map<Number, Number> results, String resultsName) {
         this.results = results;
         this.lineChart.getData().clear();
-        this.updateData();
+        this.updateData(resultsName);
     }
 
-    private void updateData() {
+    private void updateData(String dataName) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName(dataName);
 
         this.results.forEach((k, v) -> {
             series.getData().add(new XYChart.Data<>(k, v));

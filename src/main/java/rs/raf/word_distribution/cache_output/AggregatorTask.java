@@ -1,8 +1,6 @@
 package rs.raf.word_distribution.cache_output;
 
 import rs.raf.word_distribution.CruncherDataFrame;
-import rs.raf.word_distribution.Output;
-import rs.raf.word_distribution.counter_cruncher.BagOfWords;
 import rs.raf.word_distribution.events.EventManager;
 import rs.raf.word_distribution.events.EventType;
 
@@ -69,16 +67,9 @@ public class AggregatorTask<K, V> implements Runnable {
 
         this.cacheOutput.store(newName, futureResult);
         CruncherDataFrame<K, V> cruncherDataFrame = new CruncherDataFrame<>(this.newName, futureResult);
-        EventManager.getInstance().notify(EventType.STORED_CRUNCHER_DATA_FRAME, cruncherDataFrame);
+        EventManager.getInstance().notify(EventType.OUTPUT_STORED_CRUNCHER_DATA_FRAME, cruncherDataFrame);
 
-        try {
-            futureResult.get();
-        } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        EventManager.getInstance().notify(EventType.AGGREGATION_FINISHED, cruncherDataFrame);
+        this.cacheOutput.take(newName);
+        EventManager.getInstance().notify(EventType.OUTPUT_GAINED_ACCESS_TO_CRUNCHER_DATA_FRAME, cruncherDataFrame);
     }
 }

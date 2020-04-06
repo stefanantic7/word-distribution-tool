@@ -12,9 +12,11 @@ import java.util.*;
 public class SortResultsTask extends Task<Map<Number, Number>> {
 
     private Map<BagOfWords, Integer> results;
+    private String resultsName;
 
-    public SortResultsTask(Map<BagOfWords, Integer> results) {
+    public SortResultsTask(Map<BagOfWords, Integer> results, String resultsName) {
         this.results = results;
+        this.resultsName = resultsName;
     }
 
     @Override
@@ -22,7 +24,7 @@ public class SortResultsTask extends Task<Map<Number, Number>> {
         super.succeeded();
 
         Platform.runLater(() -> {
-            MainStage.getInstance().getChartResultView().updateResult(this.getValue());
+            MainStage.getInstance().getChartResultView().updateResult(this.getValue(), this.resultsName);
         });
     }
 

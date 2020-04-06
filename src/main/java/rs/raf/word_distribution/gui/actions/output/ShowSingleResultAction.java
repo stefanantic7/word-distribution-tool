@@ -23,7 +23,8 @@ public class ShowSingleResultAction implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        Map<BagOfWords, Integer> results = this.outputView.getOutput().poll(this.outputView.getEntryListView().getSelectionModel().getSelectedItem().getOriginalName());
+        String itemName = this.outputView.getEntryListView().getSelectionModel().getSelectedItem().getOriginalName();
+        Map<BagOfWords, Integer> results = this.outputView.getOutput().poll(itemName);
         if (results == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Dialog");
@@ -33,7 +34,7 @@ public class ShowSingleResultAction implements EventHandler<ActionEvent> {
             return;
         }
 
-        SortResultsTask sortResultsTask = new SortResultsTask(results);
+        SortResultsTask sortResultsTask = new SortResultsTask(results, itemName);
 
         ProgressBar progressBar = new ProgressBar();
         progressBar.progressProperty().bind(sortResultsTask.progressProperty());
