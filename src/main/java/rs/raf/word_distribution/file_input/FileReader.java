@@ -36,7 +36,7 @@ public class FileReader implements Callable<InputDataFrame> {
 
             return new InputDataFrame(file.getName(), content);
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(new OutOfMemoryEvent());
+            EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
         } catch (Exception exception) {
             exception.printStackTrace();
         }

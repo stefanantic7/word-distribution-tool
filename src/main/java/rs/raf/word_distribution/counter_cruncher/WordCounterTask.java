@@ -1,6 +1,8 @@
 package rs.raf.word_distribution.counter_cruncher;
 
 import rs.raf.word_distribution.Config;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
 
 import java.util.*;
 import java.util.concurrent.RecursiveTask;
@@ -31,24 +33,19 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
 
     @Override
     protected Map<BagOfWords, Integer> compute() {
-        try {
-            Map<BagOfWords, Integer> bagsMap = new HashMap<>();
+        Map<BagOfWords, Integer> bagsMap = new HashMap<>();
 
-            if(start >= this.content.length()) {
-                return bagsMap;
-            }
-
-            if (this.small) {
-                bagsMap = this.countWords(start, end);
-            } else {
-                bagsMap = this.divideWork();
-            }
-
+        if(start >= this.content.length()) {
             return bagsMap;
-        } catch (OutOfMemoryError outOfMemoryError) {
-            outOfMemoryError.printStackTrace();
         }
-        return null;
+
+        if (this.small) {
+            bagsMap = this.countWords(start, end);
+        } else {
+            bagsMap = this.divideWork();
+        }
+
+        return bagsMap;
     }
 
     private Map<BagOfWords, Integer> divideWork() {
@@ -119,41 +116,53 @@ public class WordCounterTask extends RecursiveTask<Map<BagOfWords, Integer>> {
     }
 
     private Map<BagOfWords, Integer> countWords(int index1, int index2) {
-        HashMap<BagOfWords, Integer> bagsMap = new HashMap<>();
+        try {
+            HashMap<BagOfWords, Integer> bagsMap = new HashMap<>();
 
-        List<String> words = this.extractWords(index1, index2);
+            List<String> words = this.extractWords(index1, index2);
 
 
-        for (int i = 0; i < (words.size() - (this.arity-1)); i++) {
-            BagOfWords bagOfWords = new BagOfWords(this.arity);
-            for (int j = i; j < i + this.arity; j++) {
-                bagOfWords.add(words.get(j));
+            for (int i = 0; i < (words.size() - (this.arity-1)); i++) {
+                BagOfWords bagOfWords = new BagOfWords(this.arity);
+                for (int j = i; j < i + this.arity; j++) {
+                    bagOfWords.add(words.get(j));
+                }
+                bagsMap.merge(bagOfWords, 1, Integer::sum);
             }
-            bagsMap.merge(bagOfWords, 1, Integer::sum);
+
+            return bagsMap;
+        } catch (OutOfMemoryError outOfMemoryError) {
+            EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
         }
 
-        return bagsMap;
+        return null;
     }
 
     private List<String> extractWords(int index1, int index2) {
-        int startOfWord = index1;
+        try {
+            int startOfWord = index1;
 
-        List<String> words = new ArrayList<>();
-        while (index1 < index2) {
-            if (!Character.isWhitespace(this.content.charAt(index1))) {
-                index1++;
-            } else {
-                String word = content.substring(startOfWord, index1).intern();
-                words.add(word);
+            List<String> words = new ArrayList<>();
+            while (index1 < index2) {
+                if (!Character.isWhitespace(this.content.charAt(index1))) {
+                    index1++;
+                } else {
+                    String word = content.substring(startOfWord, index1).intern();
+                    words.add(word);
 
-                index1++;
-                startOfWord = index1;
+                    index1++;
+                    startOfWord = index1;
+                }
             }
-        }
-        if (startOfWord<index1) {
-            words.add(content.substring(startOfWord, index1).intern());
+            if (startOfWord<index1) {
+                words.add(content.substring(startOfWord, index1).intern());
+            }
+
+            return words;
+        } catch (OutOfMemoryError outOfMemoryError) {
+            EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
         }
 
-        return words;
+        return null;
     }
 }

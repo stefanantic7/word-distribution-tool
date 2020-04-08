@@ -39,31 +39,32 @@ public class AggregatorTask<K, V> implements Runnable {
 
     @Override
     public void run() {
-        try {
-            this.aggregate();
-        } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(new OutOfMemoryEvent());
-        }
+        this.aggregate();
     }
 
     private void aggregate() {
         System.out.println("Aggregating " + this.newName);
 
         Future<Map<K, V>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
-            Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
+            try {
+                Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
 
-            for (String existingResult : existingResults) {
-                Map<K, V> existingMap = this.cacheOutput.take(existingResult);
+                for (String existingResult : existingResults) {
+                    Map<K, V> existingMap = this.cacheOutput.take(existingResult);
 
-                // Merging
-                for (Map.Entry<K, V> entry : existingMap.entrySet()) {
-                    bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), this.aggregatingFunction);
+                    // Merging
+                    for (Map.Entry<K, V> entry : existingMap.entrySet()) {
+                        bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), this.aggregatingFunction);
+                    }
+
+                    itemProcessedCallback.apply(existingResult);
                 }
 
-                itemProcessedCallback.apply(existingResult);
+                return bagOfWordsIntegerMap;
+            } catch (OutOfMemoryError outOfMemoryError) {
+                EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
             }
-
-            return bagOfWordsIntegerMap;
+            return null;
         });
 
         this.cacheOutput.store(newName, futureResult);

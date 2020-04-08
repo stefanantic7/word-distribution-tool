@@ -44,7 +44,7 @@ public class CacheOutput<K, V> extends Output<K, V> {
         try {
             return this.storage.get(name).get();
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(new OutOfMemoryEvent());
+            EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

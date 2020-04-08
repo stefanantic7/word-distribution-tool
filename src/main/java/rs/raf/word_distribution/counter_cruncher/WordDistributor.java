@@ -31,7 +31,7 @@ public class WordDistributor implements Runnable {
         try {
             cruncherDataFrame.getFuture().get();
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(new OutOfMemoryEvent());
+            EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
         }
         catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
