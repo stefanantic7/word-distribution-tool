@@ -22,11 +22,11 @@ public class RemoveCruncherAction implements EventHandler<ActionEvent> {
         // Remove from all inputs
         MainStage.getInstance().getFileInputsView().getFileInputsSet().forEach(fileInput -> {
             fileInput.unlinkCruncher(counterCruncher);
+            MainStage.getInstance().getFileInputsView().getCruncherObservableList(fileInput).remove(counterCruncher);
         });
-        // TODO remove from list view
 
         counterCruncher.destroy();
         ((Pane) this.cruncherDetailsBox.getParent()).getChildren().remove(this.cruncherDetailsBox);
-        this.cruncherDetailsBox.getCruncherObservableList().remove(counterCruncher);
+        MainStage.getInstance().getFileInputsView().getCruncherObservableList().remove(counterCruncher);
     }
 }

@@ -13,13 +13,10 @@ import rs.raf.word_distribution.client.actions.cruncher.RemoveCruncherAction;
 public class CruncherDetailsBox extends VBox {
 
     private CounterCruncher counterCruncher;
-    private ObservableList<Cruncher<?, ?>> cruncherObservableList;
     private CrunchingListView crunchingListView;
 
-    public CruncherDetailsBox(CounterCruncher counterCruncher,
-                              ObservableList<Cruncher<?, ?>> cruncherObservableList) {
+    public CruncherDetailsBox(CounterCruncher counterCruncher) {
         this.counterCruncher = counterCruncher;
-        this.cruncherObservableList = cruncherObservableList;
 
         this.crunchingListView = new CrunchingListView();
 
@@ -48,7 +45,4 @@ public class CruncherDetailsBox extends VBox {
         this.crunchingListView.remove(cruncherName);
     }
 
-    public ObservableList<Cruncher<?, ?>> getCruncherObservableList() {
-        return cruncherObservableList;
-    }
 }

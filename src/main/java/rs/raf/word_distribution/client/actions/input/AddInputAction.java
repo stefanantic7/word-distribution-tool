@@ -17,16 +17,13 @@ public class AddInputAction implements EventHandler<ActionEvent> {
     private FileInputsView fileInputsView;
     private ObjectProperty<Disk> diskObjectProperty;
     private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
-    private ObservableList<Cruncher<?, ?>> cruncherObservableList;
 
     public AddInputAction(FileInputsView fileInputsView,
                           ObjectProperty<Disk> diskObjectProperty,
-                          ObservableMap<FileInput, Disk> fileInputDiskObservableMap,
-                          ObservableList<Cruncher<?, ?>> cruncherObservableList) {
+                          ObservableMap<FileInput, Disk> fileInputDiskObservableMap) {
         this.fileInputsView = fileInputsView;
         this.diskObjectProperty = diskObjectProperty;
         this.fileInputDiskObservableMap = fileInputDiskObservableMap;
-        this.cruncherObservableList = cruncherObservableList;
     }
 
     @Override
@@ -36,9 +33,11 @@ public class AddInputAction implements EventHandler<ActionEvent> {
         AppCore.getInputThreadPool().submit(fileInput);
 
         InputConfigurationBox inputConfigurationBox
-                = new InputConfigurationBox(fileInput, this.cruncherObservableList, this.fileInputDiskObservableMap);
+                = new InputConfigurationBox(fileInput, this.fileInputDiskObservableMap);
 
-        this.fileInputsView.registerNewInput(fileInput, inputConfigurationBox.getIdleLabel().textProperty());
+        this.fileInputsView.registerNewInput(fileInput,
+                inputConfigurationBox.getIdleLabel().textProperty(),
+                inputConfigurationBox.getCrunchersListView().getItems());
 
         this.fileInputsView.getChildren().addAll(inputConfigurationBox);
     }

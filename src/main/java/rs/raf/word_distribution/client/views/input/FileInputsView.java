@@ -24,11 +24,13 @@ public class FileInputsView extends VBox {
     private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
     private Map<FileInput, StringProperty> fileInputCurrentProcessMap;
     private ObservableList<Cruncher<?, ?>> cruncherObservableList;
+    private Map<FileInput, ObservableList<Cruncher<?, ?>>> fileInputCruncherObservableListMap;
 
 
     public FileInputsView(ObservableList<Cruncher<?, ?>> cruncherObservableList) {
         this.cruncherObservableList = cruncherObservableList;
         this.fileInputCurrentProcessMap = new HashMap<>();
+        this.fileInputCruncherObservableListMap = new HashMap<>();
         this.fileInputDiskObservableMap = FXCollections.observableHashMap();
 
         this.init();
@@ -57,8 +59,7 @@ public class FileInputsView extends VBox {
         addFileInputButton.setOnAction(
                 new AddInputAction(this,
                         diskComboBox.valueProperty(),
-                        this.fileInputDiskObservableMap,
-                        this.cruncherObservableList)
+                        this.fileInputDiskObservableMap)
         );
 
 
@@ -69,9 +70,18 @@ public class FileInputsView extends VBox {
         return fileInputDiskObservableMap.keySet();
     }
 
-    public void registerNewInput(FileInput fileInput, StringProperty currentProgressProperty) {
+    public ObservableList<Cruncher<?, ?>> getCruncherObservableList(FileInput fileInput) {
+        return this.fileInputCruncherObservableListMap.get(fileInput);
+    }
+
+    public ObservableList<Cruncher<?, ?>> getCruncherObservableList() {
+        return cruncherObservableList;
+    }
+
+    public void registerNewInput(FileInput fileInput, StringProperty currentProgressProperty, ObservableList<Cruncher<?, ?>> cruncherObservableList) {
         this.fileInputDiskObservableMap.put(fileInput, fileInput.getDisk());
         this.fileInputCurrentProcessMap.put(fileInput, currentProgressProperty);
+        this.fileInputCruncherObservableListMap.put(fileInput, cruncherObservableList);
     }
 
     public void updateProcessStatus(FileInput fileInput, String newProcessStatus) {

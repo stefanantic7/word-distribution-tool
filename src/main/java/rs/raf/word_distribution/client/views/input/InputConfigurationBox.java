@@ -12,6 +12,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import rs.raf.word_distribution.Cruncher;
+import rs.raf.word_distribution.client.views.MainStage;
 import rs.raf.word_distribution.file_input.Disk;
 import rs.raf.word_distribution.file_input.FileInput;
 import rs.raf.word_distribution.client.actions.input.*;
@@ -21,15 +22,13 @@ import java.io.File;
 public class InputConfigurationBox extends VBox {
 
     private FileInput fileInput;
-    private ObservableList<Cruncher<?, ?>> cruncherObservableList;
     private ObservableMap<FileInput, Disk> fileInputDiskObservableMap;
     private Label idleLabel;
+    private ListView<Cruncher<?, ?>> crunchersListView;
 
     public InputConfigurationBox(FileInput fileInput,
-                                 ObservableList<Cruncher<?, ?>> cruncherObservableList,
                                  ObservableMap<FileInput, Disk> fileInputDiskObservableMap) {
         this.fileInput = fileInput;
-        this.cruncherObservableList = cruncherObservableList;
         this.fileInputDiskObservableMap = fileInputDiskObservableMap;
         this.init();
     }
@@ -42,10 +41,10 @@ public class InputConfigurationBox extends VBox {
         Label inputNameLabel = new Label("File input: " + this.fileInput.getDisk().getDiskPath());
         Label crunchersLabel = new Label("Crunchers");
 
-        ListView<Cruncher<?, ?>> crunchersListView = new ListView<>();
+        this.crunchersListView = new ListView<>();
         crunchersListView.setMaxHeight(200);
 
-        ComboBox<Cruncher<?, ?>> crunchersComboBox = new ComboBox<>(this.cruncherObservableList);
+        ComboBox<Cruncher<?, ?>> crunchersComboBox = new ComboBox<>(MainStage.getInstance().getCrunchersView().getCruncherObservableList());
         crunchersComboBox.setPromptText("Select cruncher");
 
         BooleanProperty linkCruncherButtonEnabledProperty = new SimpleBooleanProperty(false);
@@ -124,5 +123,9 @@ public class InputConfigurationBox extends VBox {
 
     public Label getIdleLabel() {
         return idleLabel;
+    }
+
+    public ListView<Cruncher<?, ?>> getCrunchersListView() {
+        return crunchersListView;
     }
 }

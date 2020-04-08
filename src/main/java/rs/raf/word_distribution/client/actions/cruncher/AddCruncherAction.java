@@ -50,7 +50,7 @@ public class AddCruncherAction implements EventHandler<ActionEvent> {
 
             this.crunchersView.getCruncherObservableList().add(counterCruncher);
 
-            CruncherDetailsBox cruncherDetailsBox = new CruncherDetailsBox(counterCruncher, this.crunchersView.getCruncherObservableList());
+            CruncherDetailsBox cruncherDetailsBox = new CruncherDetailsBox(counterCruncher);
 
             this.crunchersView.getCruncherCruncherDetailsBoxMap().put(counterCruncher, cruncherDetailsBox);
 
