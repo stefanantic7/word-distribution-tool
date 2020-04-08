@@ -7,7 +7,10 @@ import java.util.concurrent.*;
 public class AppCore {
 
     private static final ExecutorService inputThreadPool = Executors.newCachedThreadPool();
+
     private static final ForkJoinPool cruncherThreadPool = ForkJoinPool.commonPool();
+//    private static final ForkJoinPool cruncherThreadPool = new ForkJoinPool(4);
+
     private static final ExecutorService outputThreadPool = Executors.newCachedThreadPool();
 
     public static ExecutorService getInputThreadPool() {

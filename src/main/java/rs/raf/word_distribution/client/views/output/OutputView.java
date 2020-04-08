@@ -22,7 +22,6 @@ public class OutputView extends VBox {
     public OutputView() {
         this.init();
 
-        // TODO: move this
         this.output = new CacheOutput<>(AppCore.getOutputThreadPool());
         AppCore.getOutputThreadPool().submit(output);
     }
