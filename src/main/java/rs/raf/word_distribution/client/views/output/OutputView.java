@@ -1,5 +1,7 @@
 package rs.raf.word_distribution.client.views.output;
 
+import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -47,7 +49,11 @@ public class OutputView extends VBox {
 
 
         Button sumResultButton = new Button("Sum result");
-        sumResultButton.disableProperty().bind(entryListView.getSelectionModel().selectedItemProperty().isNull());
+        sumResultButton.setDisable(true);
+        entryListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<OutputListItem>) c -> {
+            c.next();
+            sumResultButton.setDisable(entryListView.getSelectionModel().getSelectedItems().size() <= 1);
+        });
 
         sumResultButton.setOnAction(new SumResultsAction(this));
 

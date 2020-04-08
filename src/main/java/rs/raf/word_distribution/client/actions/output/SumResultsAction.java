@@ -24,7 +24,7 @@ public class SumResultsAction implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog("1");
+        TextInputDialog dialog = new TextInputDialog("sum");
         dialog.setTitle("Confirmation");
         dialog.setHeaderText("Enter sum name");
 
