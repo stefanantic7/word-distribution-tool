@@ -1,8 +1,9 @@
 package rs.raf.word_distribution.cache_output;
 
 import rs.raf.word_distribution.CruncherDataFrame;
-import rs.raf.word_distribution.events.EventManager;
-import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.OutputGainedAccessToCruncherDataFrame;
+import rs.raf.word_distribution.observer.events.OutputStoredCruncherDataFrameEvent;
 
 import java.util.concurrent.ExecutionException;
 
@@ -28,9 +29,9 @@ public class StoreOutputTask<K, V> implements Runnable {
         }
 
         this.cacheOutput.store(cruncherDataFrame.getName(), cruncherDataFrame.getFuture());
-        EventManager.getInstance().notify(EventType.OUTPUT_STORED_CRUNCHER_DATA_FRAME, cruncherDataFrame);
+        EventManager.getInstance().notify(new OutputStoredCruncherDataFrameEvent(cruncherDataFrame));
 
         this.cacheOutput.take(cruncherDataFrame.getName());
-        EventManager.getInstance().notify(EventType.OUTPUT_GAINED_ACCESS_TO_CRUNCHER_DATA_FRAME, cruncherDataFrame);
+        EventManager.getInstance().notify(new OutputGainedAccessToCruncherDataFrame(cruncherDataFrame));
     }
 }

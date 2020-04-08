@@ -30,7 +30,7 @@ public abstract class Output<K, V> implements Runnable {
 
     public abstract void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction, Function<String, Void> itemProcessedCallback);
 
-    public void putCruncherDataFrame(CruncherDataFrame<K, V> cruncherDataFrame) {
+    public void acceptCruncherDataFrame(CruncherDataFrame<K, V> cruncherDataFrame) {
         this.cruncherDataFrameBlockingQueue.add(Optional.of(cruncherDataFrame));
     }
 

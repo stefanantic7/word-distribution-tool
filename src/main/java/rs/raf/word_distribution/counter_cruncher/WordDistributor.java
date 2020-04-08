@@ -2,9 +2,10 @@ package rs.raf.word_distribution.counter_cruncher;
 
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.InputDataFrame;
-import rs.raf.word_distribution.Output;
-import rs.raf.word_distribution.events.EventManager;
-import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.CruncherFinishedEvent;
+import rs.raf.word_distribution.observer.events.CruncherStartedEvent;
+import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -24,19 +25,19 @@ public class WordDistributor implements Runnable {
     public void run() {
         CruncherDataFrame<BagOfWords, Integer> cruncherDataFrame = this.generateCruncherDataFrame();
 
-        this.broadcastCruncherDataFrame(cruncherDataFrame);
+        this.counterCruncher.broadcastCruncherDataFrame(cruncherDataFrame);
 
-        EventManager.getInstance().notify(EventType.CRUNCHER_STARTED, counterCruncher, cruncherDataFrame);
+        EventManager.getInstance().notify(new CruncherStartedEvent(counterCruncher, cruncherDataFrame));
         try {
             cruncherDataFrame.getFuture().get();
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
+            EventManager.getInstance().notify(new OutOfMemoryEvent());
         }
         catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
-        EventManager.getInstance().notify(EventType.CRUNCHER_FINISHED, counterCruncher, cruncherDataFrame);
+        EventManager.getInstance().notify(new CruncherFinishedEvent(counterCruncher, cruncherDataFrame));
 
     }
 
@@ -56,13 +57,5 @@ public class WordDistributor implements Runnable {
 
     private String generateDataFrameName() {
         return inputDataFrame.getSource() + "-arity"+this.counterCruncher.getArity();
-    }
-
-    private void broadcastCruncherDataFrame(CruncherDataFrame<BagOfWords, Integer> cruncherDataFrame) {
-        for (Output<BagOfWords, Integer> output : this.counterCruncher.getOutputs()) {
-            System.out.println("Broadcasting to outputs: "+cruncherDataFrame.getName());
-
-            output.putCruncherDataFrame(cruncherDataFrame);
-        }
     }
 }

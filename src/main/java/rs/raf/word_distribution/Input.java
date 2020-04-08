@@ -26,8 +26,12 @@ public abstract class Input implements Runnable {
         this.crunchers.remove(cruncher);
     }
 
-    public List<Cruncher<?, ?>> getCrunchers() {
-        return crunchers;
+    public void broadcastToCrunchers(InputDataFrame inputDataFrame) {
+        this.crunchers.iterator().forEachRemaining(cruncher -> cruncher.acceptInputDataFrame(inputDataFrame));
+    }
+
+    public boolean containsCruncher(Cruncher<?, ?> cruncher) {
+        return this.crunchers.contains(cruncher);
     }
 
     public boolean isRunning() {

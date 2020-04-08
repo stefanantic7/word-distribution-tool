@@ -1,12 +1,11 @@
 package rs.raf.word_distribution.file_input;
 
-import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.InputDataFrame;
-import rs.raf.word_distribution.events.EventManager;
-import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.ReadingFinishedEvent;
+import rs.raf.word_distribution.observer.events.ReadingStartedEvent;
 
 import java.io.File;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -29,25 +28,17 @@ public class ReadingDiskWorker implements Runnable {
                 }
                 File file = optionalFile.get();
                 /// READING
-                EventManager.getInstance().notify(EventType.READING_STARTED, this.fileInput, file);
+                EventManager.getInstance().notify(new ReadingStartedEvent(this.fileInput, file));
                 Future<InputDataFrame> inputDataFrameFuture =
                         this.fileInput.getInputThreadPool().submit(new FileReader(file));
 
-                this.passToCrunchers(inputDataFrameFuture.get());
+                this.fileInput.broadcastToCrunchers(inputDataFrameFuture.get());
 
                 //// idle
-                EventManager.getInstance().notify(EventType.READING_FINISHED, this.fileInput, file);
+                EventManager.getInstance().notify(new ReadingFinishedEvent(this.fileInput));
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void passToCrunchers(InputDataFrame inputDataFrame) {
-        List<Cruncher<?, ?>> crunchers = this.fileInput.getCrunchers();
-
-        for (Cruncher<?, ?> cruncher: crunchers) {
-            cruncher.broadcastInputDataFrame(inputDataFrame);
         }
     }
 

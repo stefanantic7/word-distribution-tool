@@ -28,7 +28,7 @@ public class UnlinkCruncherAction implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
         Cruncher<?, ?> cruncher = this.cruncherListView.getSelectionModel().getSelectedItem();
-        this.input.getCrunchers().remove(cruncher);
+        this.input.unlinkCruncher(cruncher);
         this.cruncherListView.getItems().remove(cruncher);
 
         if(this.cruncherComboBox.getValue() == cruncher) {

@@ -2,9 +2,8 @@ package rs.raf.word_distribution.cache_output;
 
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.Output;
-import rs.raf.word_distribution.counter_cruncher.BagOfWords;
-import rs.raf.word_distribution.events.EventManager;
-import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class CacheOutput<K, V> extends Output<K, V> {
         try {
             return this.storage.get(name).get();
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
+            EventManager.getInstance().notify(new OutOfMemoryEvent());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

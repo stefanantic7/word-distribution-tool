@@ -1,13 +1,14 @@
 package rs.raf.word_distribution.cache_output;
 
 import rs.raf.word_distribution.CruncherDataFrame;
-import rs.raf.word_distribution.events.EventManager;
-import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
+import rs.raf.word_distribution.observer.events.OutputGainedAccessToCruncherDataFrame;
+import rs.raf.word_distribution.observer.events.OutputStoredCruncherDataFrameEvent;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -41,7 +42,7 @@ public class AggregatorTask<K, V> implements Runnable {
         try {
             this.aggregate();
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
+            EventManager.getInstance().notify(new OutOfMemoryEvent());
         }
     }
 
@@ -67,9 +68,9 @@ public class AggregatorTask<K, V> implements Runnable {
 
         this.cacheOutput.store(newName, futureResult);
         CruncherDataFrame<K, V> cruncherDataFrame = new CruncherDataFrame<>(this.newName, futureResult);
-        EventManager.getInstance().notify(EventType.OUTPUT_STORED_CRUNCHER_DATA_FRAME, cruncherDataFrame);
+        EventManager.getInstance().notify(new OutputStoredCruncherDataFrameEvent(cruncherDataFrame));
 
         this.cacheOutput.take(newName);
-        EventManager.getInstance().notify(EventType.OUTPUT_GAINED_ACCESS_TO_CRUNCHER_DATA_FRAME, cruncherDataFrame);
+        EventManager.getInstance().notify(new OutputGainedAccessToCruncherDataFrame(cruncherDataFrame));
     }
 }

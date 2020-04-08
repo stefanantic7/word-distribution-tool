@@ -27,15 +27,14 @@ public abstract class Cruncher<K, V> implements Runnable {
         this.outputs.remove(output);
     }
 
-    public void linkOutputs(Output<K, V> output) {
-        this.outputs.add(output);
+    public void broadcastCruncherDataFrame(CruncherDataFrame<K, V> cruncherDataFrame) {
+        this.outputs.iterator().forEachRemaining(output -> {
+            System.out.println("Broadcasting to outputs: "+cruncherDataFrame.getName());
+            output.acceptCruncherDataFrame(cruncherDataFrame);
+        });
     }
 
-    public List<Output<K, V>> getOutputs() {
-        return outputs;
-    }
-
-    public void broadcastInputDataFrame(InputDataFrame inputDataFrame) {
+    public void acceptInputDataFrame(InputDataFrame inputDataFrame) {
         this.inputDataFrameBlockingQueue.add(Optional.of(inputDataFrame));
     }
 

@@ -1,15 +1,12 @@
 package rs.raf.word_distribution.file_input;
 
 import rs.raf.word_distribution.InputDataFrame;
-import rs.raf.word_distribution.events.EventManager;
-import rs.raf.word_distribution.events.EventType;
+import rs.raf.word_distribution.observer.EventManager;
+import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
 public class FileReader implements Callable<InputDataFrame> {
@@ -39,7 +36,7 @@ public class FileReader implements Callable<InputDataFrame> {
 
             return new InputDataFrame(file.getName(), content);
         } catch (OutOfMemoryError outOfMemoryError) {
-            EventManager.getInstance().notify(EventType.OUT_OF_MEMORY);
+            EventManager.getInstance().notify(new OutOfMemoryEvent());
         } catch (Exception exception) {
             exception.printStackTrace();
         }

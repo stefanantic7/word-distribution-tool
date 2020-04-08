@@ -30,6 +30,6 @@ public class ChooseCruncherAction implements EventHandler<ActionEvent> {
             return;
         }
 
-        this.linkCruncherButtonEnabledProperty.set(!this.input.getCrunchers().contains(cruncher));
+        this.linkCruncherButtonEnabledProperty.set(!this.input.containsCruncher(cruncher));
     }
 }

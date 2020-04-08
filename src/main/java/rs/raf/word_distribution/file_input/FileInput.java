@@ -39,20 +39,22 @@ public class FileInput extends Input {
     }
 
     public void removeDir(File dir) {
-        filesByDirMap.get(dir).forEach(this.lastModifiedMap::remove);
+        filesByDirMap.get(dir).iterator().forEachRemaining(this.lastModifiedMap::remove);
         this.filesByDirMap.remove(dir);
         this.dirs.remove(dir);
     }
 
     @Override
     public void scan() {
-        for (File file : this.dirs) {
-            this.scanDirContent(file, file);
-        }
+        this.dirs.iterator().forEachRemaining(dir -> this.scanDirContent(dir, dir));
     }
 
     private void scanDirContent(File dir, File parentDir) {
         File[] files = dir.listFiles();
+
+        if(files == null) {
+            return;
+        }
 
         for (File file : files) {
             if (file.isDirectory()) {
