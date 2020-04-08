@@ -3,7 +3,7 @@ package rs.raf.word_distribution;
 import rs.raf.word_distribution.events.EventManager;
 import rs.raf.word_distribution.events.EventType;
 import rs.raf.word_distribution.events.hanglers.*;
-import rs.raf.word_distribution.gui.Gui;
+import rs.raf.word_distribution.client.Gui;
 
 import java.util.concurrent.*;
 

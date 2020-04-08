@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import rs.raf.word_distribution.CruncherDataFrame;
 import rs.raf.word_distribution.events.EventListener;
 import rs.raf.word_distribution.events.EventType;
-import rs.raf.word_distribution.gui.views.MainStage;
+import rs.raf.word_distribution.client.views.MainStage;
 
 public class UpdateOutputItem implements EventListener {
     @Override

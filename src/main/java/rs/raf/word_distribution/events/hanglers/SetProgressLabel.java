@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import rs.raf.word_distribution.events.EventListener;
 import rs.raf.word_distribution.events.EventType;
 import rs.raf.word_distribution.file_input.FileInput;
-import rs.raf.word_distribution.gui.views.MainStage;
+import rs.raf.word_distribution.client.views.MainStage;
 
 import java.io.File;
 
