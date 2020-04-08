@@ -2,6 +2,7 @@ package rs.raf.word_distribution.client.actions.cruncher;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 import rs.raf.word_distribution.AppCore;
 import rs.raf.word_distribution.Output;
@@ -31,7 +32,17 @@ public class AddCruncherAction implements EventHandler<ActionEvent> {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(arityString -> {
-            int arity = Integer.parseInt(result.get());
+            int arity = 0;
+            try {
+                arity = Integer.parseInt(result.get());
+            } catch (NumberFormatException numberFormatException) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Your input should be a number.");
+                alert.setContentText("Please create another one.");
+                alert.showAndWait();
+                return;
+            }
 
             CounterCruncher counterCruncher = new CounterCruncher(arity, AppCore.getCruncherThreadPool());
             counterCruncher.addOutput(this.output);
