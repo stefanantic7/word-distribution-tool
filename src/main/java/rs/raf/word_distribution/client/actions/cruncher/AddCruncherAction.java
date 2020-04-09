@@ -46,7 +46,7 @@ public class AddCruncherAction implements EventHandler<ActionEvent> {
 
             CounterCruncher counterCruncher = new CounterCruncher(arity, AppCore.getCruncherThreadPool());
             counterCruncher.addOutput(this.output);
-            AppCore.getInputThreadPool().execute(counterCruncher);
+            new Thread(counterCruncher).start();
 
             this.crunchersView.getCruncherObservableList().add(counterCruncher);
 

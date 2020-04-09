@@ -30,7 +30,7 @@ public class FileInput extends Input {
         this.filesByDirMap = new ConcurrentHashMap<>();
 
         this.readingDiskWorker = new ReadingDiskWorker(this);
-        inputThreadPool.submit(readingDiskWorker);
+        new Thread(readingDiskWorker).start();
     }
 
     public void addDir(File dir) {

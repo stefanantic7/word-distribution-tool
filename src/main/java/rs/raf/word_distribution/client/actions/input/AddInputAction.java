@@ -30,7 +30,7 @@ public class AddInputAction implements EventHandler<ActionEvent> {
     public void handle(ActionEvent event) {
         FileInput fileInput = new FileInput(diskObjectProperty.get(), AppCore.getInputThreadPool());
         fileInput.pause();
-        AppCore.getInputThreadPool().submit(fileInput);
+        new Thread(fileInput).start();
 
         InputConfigurationBox inputConfigurationBox
                 = new InputConfigurationBox(fileInput, this.fileInputDiskObservableMap);

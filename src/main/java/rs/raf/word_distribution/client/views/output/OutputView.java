@@ -23,7 +23,7 @@ public class OutputView extends VBox {
         this.init();
 
         this.output = new CacheOutput<>(AppCore.getOutputThreadPool());
-        AppCore.getOutputThreadPool().submit(output);
+        new Thread(output).start();
     }
 
     public Output<BagOfWords, Integer> getOutput() {
