@@ -24,34 +24,7 @@ public class CloseApplicationAction implements EventHandler<WindowEvent> {
         alert.initStyle(StageStyle.UNDECORATED);
 
 
-        Thread t = new Thread(() -> {
-            MainStage.getInstance().getFileInputsView().getFileInputsSet().forEach(Input::destroy);
-            MainStage.getInstance().getCrunchersView().getCruncherObservableList().forEach(Cruncher::destroy);
-            MainStage.getInstance().getOutputView().getOutput().destroy();
-
-            AppCore.getInputThreadPool().shutdown();
-            AppCore.getCruncherThreadPool().shutdown();
-            AppCore.getOutputThreadPool().shutdown();
-
-            AppCore.getInputTasksThreadPool().shutdown();
-            AppCore.getOutputTasksThreadPool().shutdown();
-
-            AppCore.getCruncherTasksThreadPool().awaitQuiescence(365, TimeUnit.DAYS);
-
-            try {
-                AppCore.getInputThreadPool().awaitTermination(365, TimeUnit.DAYS);
-                AppCore.getCruncherThreadPool().awaitTermination(365, TimeUnit.DAYS);
-                AppCore.getOutputThreadPool().awaitTermination(365, TimeUnit.DAYS);
-
-                AppCore.getInputTasksThreadPool().awaitTermination(365, TimeUnit.DAYS);
-                AppCore.getOutputTasksThreadPool().awaitTermination(365, TimeUnit.DAYS);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-
-            Platform.runLater(alert::close);
-
-        });
+        Thread t = new Thread(new CloseApplicationThread(alert));
         t.start();
 
         alert.showAndWait();
