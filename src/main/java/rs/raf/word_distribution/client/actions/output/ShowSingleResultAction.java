@@ -4,11 +4,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressBar;
+import rs.raf.word_distribution.AppCore;
 import rs.raf.word_distribution.counter_cruncher.BagOfWords;
 import rs.raf.word_distribution.client.tasks.SortResultsTask;
 import rs.raf.word_distribution.client.views.output.OutputView;
 
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
 public class ShowSingleResultAction implements EventHandler<ActionEvent> {
 
@@ -39,8 +41,11 @@ public class ShowSingleResultAction implements EventHandler<ActionEvent> {
             this.outputView.getChildren().remove(progressBar);
         });
 
-        Thread t = new Thread(sortResultsTask);
-        t.start();
+        try {
+            AppCore.getOutputTasksThreadPool().submit(sortResultsTask);
+        } catch (RejectedExecutionException rejectedExecutionException) {
+            return;
+        }
 
         this.outputView.getChildren().add(progressBar);
     }

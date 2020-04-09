@@ -1,12 +1,10 @@
 package rs.raf.word_distribution.client.actions.input;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import rs.raf.word_distribution.AppCore;
-import rs.raf.word_distribution.Cruncher;
 import rs.raf.word_distribution.file_input.Disk;
 import rs.raf.word_distribution.file_input.FileInput;
 import rs.raf.word_distribution.client.views.input.FileInputsView;
@@ -28,9 +26,9 @@ public class AddInputAction implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        FileInput fileInput = new FileInput(diskObjectProperty.get(), AppCore.getInputThreadPool());
+        FileInput fileInput = new FileInput(diskObjectProperty.get(), AppCore.getInputTasksThreadPool());
         fileInput.pause();
-        new Thread(fileInput).start();
+        AppCore.getInputThreadPool().submit(fileInput);
 
         InputConfigurationBox inputConfigurationBox
                 = new InputConfigurationBox(fileInput, this.fileInputDiskObservableMap);

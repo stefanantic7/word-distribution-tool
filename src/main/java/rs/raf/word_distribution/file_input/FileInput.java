@@ -1,5 +1,6 @@
 package rs.raf.word_distribution.file_input;
 
+import rs.raf.word_distribution.AppCore;
 import rs.raf.word_distribution.Input;
 import rs.raf.word_distribution.Utils;
 
@@ -30,7 +31,7 @@ public class FileInput extends Input {
         this.filesByDirMap = new ConcurrentHashMap<>();
 
         this.readingDiskWorker = new ReadingDiskWorker(this);
-        new Thread(readingDiskWorker).start();
+        AppCore.getInputThreadPool().submit(readingDiskWorker);
     }
 
     public void addDir(File dir) {

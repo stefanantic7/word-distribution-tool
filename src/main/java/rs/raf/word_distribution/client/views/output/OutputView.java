@@ -1,6 +1,5 @@
 package rs.raf.word_distribution.client.views.output;
 
-import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -22,8 +21,8 @@ public class OutputView extends VBox {
     public OutputView() {
         this.init();
 
-        this.output = new CacheOutput<>(AppCore.getOutputThreadPool());
-        new Thread(output).start();
+        this.output = new CacheOutput<>(AppCore.getOutputTasksThreadPool());
+        AppCore.getOutputThreadPool().submit(output);
     }
 
     public Output<BagOfWords, Integer> getOutput() {
