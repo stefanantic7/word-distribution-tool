@@ -7,10 +7,7 @@ import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -27,11 +24,18 @@ public class CacheOutput<K, V> extends Output<K, V> {
 
     @Override
     public void process(CruncherDataFrame<K, V> cruncherDataFrame) {
-        outputThreadPool.submit(new StoreOutputTask<>(this, cruncherDataFrame));
+        try {
+            outputThreadPool.submit(new StoreOutputTask<>(this, cruncherDataFrame));
+        } catch (RejectedExecutionException ignored) {
+        }
     }
 
+    @Override
     public void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction, Function<String, Void> itemProcessedCallback) {
-        outputThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction, itemProcessedCallback));
+        try {
+            outputThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction, itemProcessedCallback));
+        } catch (RejectedExecutionException ignored) {
+        }
     }
 
     @Override

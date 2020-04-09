@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -45,28 +46,32 @@ public class AggregatorTask<K, V> implements Runnable {
     private void aggregate() {
         System.out.println("Aggregating " + this.newName);
 
-        Future<Map<K, V>> futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
-            try {
-                Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
+        Future<Map<K, V>> futureResult = null;
+        try {
+            futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
+                try {
+                    Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
 
-                for (String existingResult : existingResults) {
-                    Map<K, V> existingMap = this.cacheOutput.take(existingResult);
+                    for (String existingResult : existingResults) {
+                        Map<K, V> existingMap = this.cacheOutput.take(existingResult);
 
-                    // Merging
-                    for (Map.Entry<K, V> entry : existingMap.entrySet()) {
-                        bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), this.aggregatingFunction);
+                        // Merging
+                        for (Map.Entry<K, V> entry : existingMap.entrySet()) {
+                            bagOfWordsIntegerMap.merge(entry.getKey(), entry.getValue(), this.aggregatingFunction);
+                        }
+
+                        itemProcessedCallback.apply(existingResult);
                     }
 
-                    itemProcessedCallback.apply(existingResult);
+                    return bagOfWordsIntegerMap;
+                } catch (OutOfMemoryError outOfMemoryError) {
+                    EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
                 }
-
-                return bagOfWordsIntegerMap;
-            } catch (OutOfMemoryError outOfMemoryError) {
-                EventManager.getInstance().notify(new OutOfMemoryEvent(outOfMemoryError));
-            }
-            return null;
-        });
-
+                return null;
+            });
+        } catch (RejectedExecutionException rejectedExecutionException) {
+            return;
+        }
         this.cacheOutput.store(newName, futureResult);
         CruncherDataFrame<K, V> cruncherDataFrame = new CruncherDataFrame<>(this.newName, futureResult);
         EventManager.getInstance().notify(new OutputStoredCruncherDataFrameEvent(cruncherDataFrame));

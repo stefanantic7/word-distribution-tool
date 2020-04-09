@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 
 public class CounterCruncher extends Cruncher<BagOfWords, Integer> {
 
@@ -25,7 +26,10 @@ public class CounterCruncher extends Cruncher<BagOfWords, Integer> {
     @Override
     public void handle(InputDataFrame inputDataFrame) {
         System.out.println("handling: "+inputDataFrame.getSource());
-        cruncherThreadPool.submit(new WordDistributor(inputDataFrame, this));
+        try {
+            cruncherThreadPool.submit(new WordDistributor(inputDataFrame, this));
+        } catch (RejectedExecutionException ignored) {
+        }
     }
 
     public int getArity() {

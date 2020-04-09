@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 
 public class ReadingDiskWorker implements Runnable {
 
@@ -27,15 +28,17 @@ public class ReadingDiskWorker implements Runnable {
                     break;
                 }
                 File file = optionalFile.get();
+
+                Future<InputDataFrame> inputDataFrameFuture = this.fileInput.getInputThreadPool().submit(new FileReader(file));
                 /// READING
                 EventManager.getInstance().notify(new ReadingStartedEvent(this.fileInput, file));
-                Future<InputDataFrame> inputDataFrameFuture =
-                        this.fileInput.getInputThreadPool().submit(new FileReader(file));
 
                 this.fileInput.broadcastToCrunchers(inputDataFrameFuture.get());
 
                 //// idle
                 EventManager.getInstance().notify(new ReadingFinishedEvent(this.fileInput));
+            } catch (RejectedExecutionException rejectedExecutionException) {
+                return;
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
