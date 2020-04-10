@@ -29,7 +29,7 @@ public class ReadingDiskWorker implements Runnable {
                 }
                 File file = optionalFile.get();
 
-                Future<InputDataFrame> inputDataFrameFuture = this.fileInput.getInputThreadPool().submit(new FileReader(file));
+                Future<InputDataFrame> inputDataFrameFuture = this.fileInput.getInputTasksThreadPool().submit(new FileReader(file));
                 /// READING
                 EventManager.getInstance().notify(new ReadingStartedEvent(this.fileInput, file));
 

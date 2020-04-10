@@ -14,7 +14,7 @@ public class FileInput extends Input {
 
     private List<File> dirs;
 
-    private ExecutorService inputThreadPool;
+    private ExecutorService inputTasksThreadPool;
 
     private Map<File, Long> lastModifiedMap;
 
@@ -22,11 +22,11 @@ public class FileInput extends Input {
 
     private ReadingDiskWorker readingDiskWorker;
 
-    public FileInput(Disk disc, ExecutorService inputThreadPool) {
+    public FileInput(Disk disc, ExecutorService inputTasksThreadPool) {
         super();
         this.disk = disc;
         this.dirs = new CopyOnWriteArrayList<>();
-        this.inputThreadPool = inputThreadPool;
+        this.inputTasksThreadPool = inputTasksThreadPool;
         this.lastModifiedMap = new ConcurrentHashMap<>();
         this.filesByDirMap = new ConcurrentHashMap<>();
 
@@ -97,7 +97,7 @@ public class FileInput extends Input {
         return disk;
     }
 
-    public ExecutorService getInputThreadPool() {
-        return inputThreadPool;
+    public ExecutorService getInputTasksThreadPool() {
+        return inputTasksThreadPool;
     }
 }

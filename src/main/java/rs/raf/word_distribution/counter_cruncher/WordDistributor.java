@@ -10,7 +10,6 @@ import rs.raf.word_distribution.observer.events.OutOfMemoryEvent;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
 
 public class WordDistributor implements Runnable {
@@ -55,7 +54,7 @@ public class WordDistributor implements Runnable {
 
         try {
             Future<Map<BagOfWords, Integer>> futureResult
-                    = this.counterCruncher.getCruncherThreadPool().submit(wordCounterTask);
+                    = this.counterCruncher.getCruncherTasksThreadPool().submit(wordCounterTask);
 
             return new CruncherDataFrame<>(dataFrameName, futureResult);
         } catch (RejectedExecutionException rejectedExecutionException) {

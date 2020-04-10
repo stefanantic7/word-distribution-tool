@@ -19,6 +19,10 @@ public class ForceExiting extends Listener<OutOfMemoryEvent> {
             alert.initStyle(StageStyle.UNDECORATED);
             alert.showAndWait();
 
+            AppCore.getInputThreadPool().shutdownNow();
+            AppCore.getCruncherThreadPool().shutdownNow();
+            AppCore.getOutputThreadPool().shutdownNow();
+
             AppCore.getInputTasksThreadPool().shutdownNow();
             AppCore.getOutputTasksThreadPool().shutdownNow();
 

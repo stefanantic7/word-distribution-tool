@@ -15,17 +15,17 @@ public class CacheOutput<K, V> extends Output<K, V> {
 
     private Map<String, Future<Map<K, V>>> storage;
 
-    private ExecutorService outputThreadPool;
+    private ExecutorService outputTasksThreadPool;
 
-    public CacheOutput(ExecutorService outputThreadPool) {
+    public CacheOutput(ExecutorService outputTasksThreadPool) {
         this.storage = new ConcurrentHashMap<>();
-        this.outputThreadPool = outputThreadPool;
+        this.outputTasksThreadPool = outputTasksThreadPool;
     }
 
     @Override
     public void process(CruncherDataFrame<K, V> cruncherDataFrame) {
         try {
-            outputThreadPool.submit(new StoreOutputTask<>(this, cruncherDataFrame));
+            outputTasksThreadPool.submit(new StoreOutputTask<>(this, cruncherDataFrame));
         } catch (RejectedExecutionException ignored) {
         }
     }
@@ -33,7 +33,7 @@ public class CacheOutput<K, V> extends Output<K, V> {
     @Override
     public void aggregate(String newName, List<String> existingResults, BiFunction<V, V, V> aggregatingFunction, Function<String, Void> itemProcessedCallback) {
         try {
-            outputThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction, itemProcessedCallback));
+            outputTasksThreadPool.submit(new AggregatorTask<>(newName, existingResults, this, aggregatingFunction, itemProcessedCallback));
         } catch (RejectedExecutionException ignored) {
         }
     }
@@ -64,7 +64,7 @@ public class CacheOutput<K, V> extends Output<K, V> {
         return this.take(name);
     }
 
-    public ExecutorService getOutputThreadPool() {
-        return outputThreadPool;
+    public ExecutorService getOutputTasksThreadPool() {
+        return outputTasksThreadPool;
     }
 }

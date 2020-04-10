@@ -48,7 +48,7 @@ public class AggregatorTask<K, V> implements Runnable {
 
         Future<Map<K, V>> futureResult = null;
         try {
-            futureResult = this.cacheOutput.getOutputThreadPool().submit(() -> {
+            futureResult = this.cacheOutput.getOutputTasksThreadPool().submit(() -> {
                 try {
                     Map<K, V> bagOfWordsIntegerMap = new HashMap<>();
 
