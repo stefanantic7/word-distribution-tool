@@ -31,7 +31,8 @@ public class StoreOutputTask<K, V> implements Runnable {
         this.cacheOutput.store(cruncherDataFrame.getName(), cruncherDataFrame.getFuture());
         EventManager.getInstance().notify(new OutputStoredCruncherDataFrameEvent(cruncherDataFrame));
 
-        this.cacheOutput.take(cruncherDataFrame.getName());
-        EventManager.getInstance().notify(new OutputGainedAccessToCruncherDataFrame(cruncherDataFrame));
+        if (this.cacheOutput.take(cruncherDataFrame.getName()) != null) {
+            EventManager.getInstance().notify(new OutputGainedAccessToCruncherDataFrame(cruncherDataFrame));
+        }
     }
 }

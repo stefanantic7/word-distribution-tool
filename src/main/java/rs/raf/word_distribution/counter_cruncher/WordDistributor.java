@@ -38,6 +38,7 @@ public class WordDistributor implements Runnable {
         }
         catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            return;
         }
 
         EventManager.getInstance().notify(new CruncherFinishedEvent(counterCruncher, cruncherDataFrame));

@@ -47,6 +47,7 @@ public abstract class Output<K, V> implements Runnable {
                 this.process(cruncherDataFrame);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }

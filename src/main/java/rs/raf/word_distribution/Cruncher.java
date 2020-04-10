@@ -52,6 +52,7 @@ public abstract class Cruncher<K, V> implements Runnable {
                 this.handle(inputDataFrame);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }

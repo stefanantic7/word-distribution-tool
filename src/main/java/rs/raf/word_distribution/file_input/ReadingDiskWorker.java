@@ -41,6 +41,7 @@ public class ReadingDiskWorker implements Runnable {
                 return;
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }

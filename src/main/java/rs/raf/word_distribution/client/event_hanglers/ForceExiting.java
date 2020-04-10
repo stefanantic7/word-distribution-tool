@@ -12,19 +12,20 @@ public class ForceExiting extends Listener<OutOfMemoryEvent> {
     @Override
     protected void handleEvent(OutOfMemoryEvent event) {
         Platform.runLater(() -> {
+            AppCore.getInputThreadPool().shutdownNow();
+            AppCore.getCruncherThreadPool().shutdownNow();
+            AppCore.getOutputThreadPool().shutdownNow();
+
+            AppCore.getInputTasksThreadPool().shutdownNow();
+//            AppCore.getCruncherThreadPool().shutdownNow();
+            AppCore.getOutputTasksThreadPool().shutdownNow();
+
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Information Dialog");
             alert.setHeaderText("Out of memory while reading");
             alert.setContentText("Aborting");
             alert.initStyle(StageStyle.UNDECORATED);
             alert.showAndWait();
-
-            AppCore.getInputThreadPool().shutdownNow();
-            AppCore.getCruncherThreadPool().shutdownNow();
-            AppCore.getOutputThreadPool().shutdownNow();
-
-            AppCore.getInputTasksThreadPool().shutdownNow();
-            AppCore.getOutputTasksThreadPool().shutdownNow();
 
             Platform.exit();
             System.exit(1);
