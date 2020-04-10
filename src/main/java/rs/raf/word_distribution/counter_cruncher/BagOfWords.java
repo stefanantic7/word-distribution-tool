@@ -41,13 +41,4 @@ public class BagOfWords {
                 '}';
     }
 
-    // Use this method if BagOfWords extends ArrayList or LinkedList()
-//    @Override
-//    public boolean add(String string) {
-//        int index = Collections.binarySearch(this, string);
-//        if (index < 0) index = ~index;
-//        super.add(index, string);
-//        return true;
-//    }
-
 }
