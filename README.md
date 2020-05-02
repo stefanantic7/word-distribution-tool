@@ -10,3 +10,7 @@ Install all dependencies and start the application:
 mvn clean install
 mvn javafx:run
 ```
+
+The tool example:
+
+![The application example](./word-distribution-tool.png)
